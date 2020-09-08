@@ -8,28 +8,12 @@ matplotlib.use('TkAgg')
 import sys
 # sys.path.append('/storage/home/tommaria/thesis/tools')
 sys.path.append('../tools')
-# from tools import *
-# from tools_alternate import *
 from tools_gs import *
 
 segment_list = get_segment_list('BOTH')
 detector = 'L'
 print(detector)
 
-# Old process:
-# H1 segments - 0,1
-# L1 segments - 0,1,2,3,4
-
-# New process (alt):
-# H1 segments - 0-4
-# L1 segments - 0-4
-
-# GS based process:
-# Tc=16
-# H1 segments - 0-4,5-18,19-29,30-39,325-326,586-588,660-669,690-709,710-729,811,1587,1633,1650,1659,1669,1687-part
-# L1 segments - 0-4,5-18,19-29,30-39,325-326,586-588,660-669,690-709,710-729,811,1587,1633,1650,1659,1669,1687-part
-
-# Tc=64
 # H1 segments - 0-4,5-8,9-49,50-99,100-149,150-199,200-249,250-299,300-325,326,327-349,350-399,548,587,590-639,640-689,690-739,740-789,811,877,921,1117,1265,1369,1580,1587,1633,1650,1659,1669,1687
 # L1 segments - 0-4,5-8,9-49,50-99,100-149,150-199,200-249,250-299,300-325,326,327-349,548,587,590-639,640-689,690-739,740-789,811,877,921,1117,1265,1369,1580,1587,1633,1650,1659,1669,1687
 

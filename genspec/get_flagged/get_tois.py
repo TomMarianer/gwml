@@ -11,7 +11,7 @@ from os.path import join
 import sys
 # sys.path.append('/storage/home/tommaria/thesis/tools')
 sys.path.append('../tools')
-from tools_gs import *
+from tools_gs_par import *
 
 def get_tois(method):
 	with h5py.File('tois.hdf5', 'r') as f:

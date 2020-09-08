@@ -9,7 +9,7 @@ matplotlib.use('TkAgg')
 import sys
 # sys.path.append('/storage/home/tommaria/thesis/tools')
 sys.path.append('../tools')
-from tools_gs import *
+from tools_gs_par import *
 import get_tois
 
 def find_file(t, files):

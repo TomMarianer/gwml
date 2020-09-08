@@ -1,0 +1,9 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=1
+#PBS -N combine
+
+cd $PBS_O_WORKDIR
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64/
+cat /etc/hostname |cut -f1 -d'.' > $HOME/python_current_host
+source $HOME/default_conda/bin/activate gw_new
+python ../../condition/combine_segment.py

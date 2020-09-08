@@ -1,0 +1,18 @@
+#!/bin/bash
+#PBS -l select=1:ngpus=1
+#PBS -N features
+
+cd $PBS_O_WORKDIR
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64/
+cat /etc/hostname |cut -f1 -d'.' > $HOME/python_current_host
+source activate gpu_env
+# python extract_features.py
+# python extract_features_split.py
+# python extract_unlabeled.py
+# python extract_predict_test.py
+# python extract_predict.py
+# python extract_predict_unlabeled.py
+# python extract_predict_new.py
+# python extract_predict_unlabeled_new.py
+# python extract_gram.py
+python extract_gram_unlabeled.py

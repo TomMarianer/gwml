@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
+# script for combining the conditioned spectrogram files
+# used after conditioning using the condition_raw.py (or the condition_raw_par.py) script
 
 import matplotlib
 matplotlib.use('TkAgg')
 
 import sys
-sys.path.append('/storage/home/tommaria/thesis/tools')
+# sys.path.append('/storage/home/tommaria/thesis/tools')
+sys.path.append('../tools')
 # from tools import *
 # from tools_alternate import *
 from tools_gs import *

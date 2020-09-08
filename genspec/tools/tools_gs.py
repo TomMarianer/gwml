@@ -26,7 +26,7 @@ def get_segment_list(detector='H'):
 	output: segment_list - list of segments of times when the given detector was active
 	"""
 
-	data_path = Path('/storage/home/tommaria/thesis/tools')
+	data_path = Path('../segment_files')
 	if detector == 'BOTH':
 		# filename = join(data_path, 'O1_' + detector + '_DATA')
 		filename = join(data_path, 'O1_O2_' + detector + '_DATA')

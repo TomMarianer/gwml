@@ -4,15 +4,19 @@
 Created on Sun Dec 15 17:39:36 2019
 
 @author: tommarianer
+
+script for finding gravityspy glitches which are missing from our dataset 
+(the files containing them were not downloaded because they were not publicly available)
 """
 
 import matplotlib
 matplotlib.use('TkAgg')
 
 import sys
-sys.path.append('/storage/home/tommaria/thesis/tools')
-# from tools import *
-from tools_alternate import *
+# sys.path.append('/storage/home/tommaria/thesis/tools')
+sys.path.append('../tools')
+from tools_gs import *
+from params import *
 import pandas as pd
 
 metadata = pd.read_csv('trainingset_v1d1_metadata.csv', 
@@ -22,8 +26,6 @@ dfidxs = metadata.index
 x = []
 y = []
 times = []
-Tc = 16
-To = 2
 idx = []
 
 start_time = time.time()

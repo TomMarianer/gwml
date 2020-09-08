@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-# script for conditioning raw strain data and generating spectrograms
-# non parallel version
+"""
+script for conditioning raw strain data and generating spectrograms
+non parallel version
+"""
 
 import matplotlib
 matplotlib.use('TkAgg')

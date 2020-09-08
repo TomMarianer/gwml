@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-# script for downloading files containing gravity spy glitches
-# there are differences from the download_16.py script that result from when I wrote this
-# they should be fixed some day
+"""
+script for downloading files containing gravity spy glitches
+there are differences from the download_16.py script that result from when I wrote this
+they should be fixed some day
+"""
 
 # Standard python numerical analysis imports:
 import numpy as np

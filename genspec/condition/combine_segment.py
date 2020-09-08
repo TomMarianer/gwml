@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-# script for combining the conditioned spectrogram files
-# used after conditioning using the condition_raw.py (or the condition_raw_par.py) script
+"""
+script for combining the conditioned spectrogram files
+used after conditioning using the condition_raw.py (or the condition_raw_par.py) script
+"""
 
 import matplotlib
 matplotlib.use('TkAgg')

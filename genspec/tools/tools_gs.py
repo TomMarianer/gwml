@@ -1,6 +1,8 @@
 #!/usr/bin/python
-# tools for loading and conditioning strain data, and generating spectrograms
-# non parallel version
+"""
+tools for loading and conditioning strain data, and generating spectrograms
+non parallel version
+"""
 
 from gwosc.datasets import event_gps
 from gwpy.timeseries import TimeSeries

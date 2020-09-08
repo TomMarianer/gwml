@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-# script for downloading bulk ligo data
+"""
+script for downloading bulk ligo data
+"""
 
 # Standard python numerical analysis imports:
 import numpy as np

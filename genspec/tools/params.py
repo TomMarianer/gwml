@@ -1,5 +1,7 @@
 #!/usr/bin/python
-# parameters file for conditioning
+"""
+parameters file for conditioning
+"""
 
 Tc = 64 # chunk length [s]
 To = 2 # chunk overlap [s]

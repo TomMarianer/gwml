@@ -1,4 +1,8 @@
 #!/usr/bin/python
+"""
+script for training a cnn on the spectrograms generated of the gravityspy glitch dataset 
+using the transfer learning method
+"""
 
 import os
 from os import listdir

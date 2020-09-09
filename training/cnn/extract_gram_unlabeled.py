@@ -1,4 +1,8 @@
 #!/usr/bin/python
+"""
+script for extracting latent space features for unlabeled spectrograms
+including gram matrix method deviations and total deviation normalized by the mean validation devation
+"""
 
 import sys
 # sys.path.append('/dovilabfs/work/tommaria/gw/tools')

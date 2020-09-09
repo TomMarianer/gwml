@@ -1,4 +1,7 @@
 #!/usr/bin/python
+"""
+script for evaluating the trained network
+"""
 
 import sys
 # sys.path.append('/dovilabfs/work/tommaria/gw/tools')

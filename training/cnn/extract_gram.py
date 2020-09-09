@@ -1,4 +1,9 @@
 #!/usr/bin/python
+"""
+script for extracting latent space features for the training set spectrograms
+it also extracts predictions and gram matrix method values - mins and maxs for each class, 
+and deviations for the test and validation sets (including mean validation deviation)
+"""
 
 import sys
 # sys.path.append('/dovilabfs/work/tommaria/gw/tools')

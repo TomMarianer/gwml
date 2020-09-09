@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -l select=1:ngpus=1
-#PBS -N gravityspy_gpu
+#PBS -N train
 
 cd $PBS_O_WORKDIR
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64/

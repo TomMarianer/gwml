@@ -22,16 +22,8 @@ from keras.callbacks import ModelCheckpoint
 from keras_tqdm import TQDMCallback
 from sklearn.preprocessing import LabelEncoder
 import sys
-# sys.path.append('/dovilabfs/work/tommaria/gw/tools')
-# from load_dataset import *
-
-# extract_model = 'vgg16'
-# extract_model = 'inceptionv3'
-# extract_model = 'xception'
-extract_model = 'resnet152v2'
-# extract_model = 'inception_resnetv2'
-
-input_size = (299, 299)
+sys.path.append('../tools')
+from gsparams import *
 
 data_path = Path('/dovilabfs/work/tommaria/gw/data/gravityspy/fromraw')
 
@@ -101,10 +93,6 @@ output = Dense(num_classes, activation='softmax')(output)
 model = Model(input=trained_model.input, output=output)
 model.summary()
 
-train_set = 'fromraw_gs_wrap_no_ty'
-opt_method = 'adadelta'
-model_num = '15'
-model_name = 'gpu_test_' + model_num
 model_path = Path('/dovilabfs/work/tommaria/gw/gravityspy/gpu/' + train_set + '/new/' + extract_model + '/' + opt_method + '/' + model_name)
 weights_file = join(model_path, model_name + '.weights.best.hdf5')
 if not os.path.exists(model_path):

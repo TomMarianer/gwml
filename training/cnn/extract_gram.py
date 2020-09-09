@@ -9,24 +9,13 @@ import sys
 # sys.path.append('/dovilabfs/work/tommaria/gw/tools')
 sys.path.append('../tools')
 from gstools import *
+from gsparams import *
 from keras import backend as K
 
 # Load models
 
 start_time = time.time()
 
-# extract_model = 'inceptionv3'
-extract_model = 'resnet152v2'
-# extract_model = 'inception_resnetv2'
-
-input_size = (299, 299)
-
-train_set = 'fromraw_gs_wrap_no_ty'
-opt_method = 'adadelta'
-num = 15
-
-model_num = str(num)
-model_name = 'gpu_test_' + model_num
 model_path = Path('/dovilabfs/work/tommaria/gw/gravityspy/gpu/' + train_set + '/new/' + extract_model + '/' + opt_method + '/' + model_name)
 model_file = join(model_path, model_name + '.h5')
 weights_file = join(model_path, model_name + '.weights.best.hdf5')

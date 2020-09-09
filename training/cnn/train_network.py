@@ -39,7 +39,6 @@ with h5py.File(join(data_path, 'trainingset_fromraw_centered_2048_Tc_64_gs_split
 	y_test = [item.decode('ascii') for item in list(f['y_test'])]
 	y_val = [item.decode('ascii') for item in list(f['y_val'])]
 
-
 # encode labels to integers
 encoder = LabelEncoder().fit(y_train)
 y_train = encoder.transform(y_train)
@@ -98,11 +97,11 @@ output = Dense(num_classes, activation='softmax')(output)
 model = Model(input=trained_model.input, output=output)
 model.summary()
 
-train_set = 'fromraw_gs_based'
+train_set = 'fromraw_gs_wrap_no_ty'
 opt_method = 'adadelta'
 model_num = '15'
 model_name = 'gpu_test_' + model_num
-model_path = Path('/dovilabfs/work/tommaria/gw/gravityspy/gpu/' + train_set + '/new_wrap_no_ty/' + extract_model + '/' + opt_method + '/' + model_name)
+model_path = Path('/dovilabfs/work/tommaria/gw/gravityspy/gpu/' + train_set + '/new/' + extract_model + '/' + opt_method + '/' + model_name)
 weights_file = join(model_path, model_name + '.weights.best.hdf5')
 if not os.path.exists(model_path):
     os.makedirs(model_path)

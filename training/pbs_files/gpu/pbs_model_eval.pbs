@@ -6,4 +6,4 @@ cd $PBS_O_WORKDIR
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64/
 cat /etc/hostname |cut -f1 -d'.' > $HOME/python_current_host
 source activate gpu_env
-python model_evaluation.py
+python ../../cnn/model_evaluation.py

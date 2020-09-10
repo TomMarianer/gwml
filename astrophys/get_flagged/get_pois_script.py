@@ -11,9 +11,6 @@ import sys
 sys.path.append('../tools')
 from tools_gs_par import *
 
-sys.path.append('../../shared/')
-import get_tois
-
 def find_file(t, files):
 	"""Return file string containing time t.
 	"""
@@ -44,7 +41,8 @@ method = 'kde'
 # method = 'y_hat_chirp'
 # method = 'y_hat_nota'
 
-tois = get_tois.get_tois(method)
+with h5py.File('../../shared/tois.hdf5', 'r') as f:
+	tois = np.asarray(f[method])
 
 print(len(tois))
 

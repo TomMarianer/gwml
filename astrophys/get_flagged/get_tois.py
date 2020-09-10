@@ -14,7 +14,7 @@ sys.path.append('../tools')
 from tools_gs_par import *
 
 def get_tois(method):
-	with h5py.File('tois.hdf5', 'r') as f:
+	with h5py.File('../../shared/tois.hdf5', 'r') as f:
 		tois = np.asarray(f[method])
 
 	return tois

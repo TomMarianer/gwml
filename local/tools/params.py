@@ -18,4 +18,7 @@ y_range = (-25, 21.5)
 kernel = 'gaussian'
 bandwidth = 0.3
 
-kde_th = -11.5 # kde method threshold
+### thresholds
+
+kde_th = -11.5
+gram_th = 5100

@@ -27,5 +27,5 @@ gram_th = 5100
 
 ### paths
 
-features_path=Path('/Users/tommarianer/LOSC Data/gravityspy/features')
-conditioned_path=Path('/Users/tommarianer/LOSC Data/conditioned_data/16KHZ')
+features_path = Path('/Users/tommarianer/LOSC Data/gravityspy/features')
+conditioned_path = Path('/Users/tommarianer/LOSC Data/conditioned_data/16KHZ')

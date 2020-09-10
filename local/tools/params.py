@@ -3,6 +3,8 @@
 parameters file for local
 """
 
+from pathlib import Path
+
 ### model parameters
 
 condition_method = 'gs_wrap_no_ty'
@@ -22,3 +24,8 @@ bandwidth = 0.3
 
 kde_th = -11.5
 gram_th = 5100
+
+### paths
+
+features_path=Path('/Users/tommarianer/LOSC Data/gravityspy/features')
+conditioned_path=Path('/Users/tommarianer/LOSC Data/conditioned_data/16KHZ')

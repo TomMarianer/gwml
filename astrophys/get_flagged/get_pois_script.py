@@ -10,6 +10,8 @@ import sys
 # sys.path.append('/storage/home/tommaria/thesis/tools')
 sys.path.append('../tools')
 from tools_gs_par import *
+
+sys.path.append('../../shared/')
 import get_tois
 
 def find_file(t, files):

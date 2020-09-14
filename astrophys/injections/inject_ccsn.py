@@ -67,7 +67,7 @@ for ccsn_file in ccsn_files[:1]:
 
 	h_rss.append(np.sqrt(hp.dot(hp) * hp.dt).value)
 
-	results = pool.starmap(load_inject_condition, [(t[0], t[1], t[2], inj_type, inj_params=None, local, Tc, To, fw, 
+	results = pool.starmap(load_inject_condition, [(t[0], t[1], t[2], inj_type, local, Tc, To, fw, 
 						   window, detector, qtrans, qsplit, dT, hp) for t in times_par])
 
 	x = []

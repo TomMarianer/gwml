@@ -134,8 +134,8 @@ def inject(data, t_inj, inj_type, inj_params):
 	injected_data = data.inject(hp)
 	return injected_data
 
-def load_inject_condition(t_i, t_f, t_inj, inj_type, inj_params, local=False, Tc=16, To=2, fw=2048, window='tukey', detector='H', 
-						  qtrans=False, qsplit=False, dT=2.0, save=False, data_path=None):
+def load_inject_condition(t_i, t_f, t_inj, inj_type, inj_params=None, local=False, Tc=16, To=2, fw=2048, window='tukey', detector='H', 
+						  qtrans=False, qsplit=False, dT=2.0, save=False, data_path=None, hp=None):
 	"""Fucntion to load a chunk, inject a waveform and condition, created to enable parallelizing.
 	"""
 	if local:
@@ -156,7 +156,21 @@ def load_inject_condition(t_i, t_f, t_inj, inj_type, inj_params, local=False, Tc
 		return
 
 	wf_times = data.times.value
-	injected_data = inject(data, t_inj, inj_type, inj_params)
+
+	if inj_type == 'ccsn':
+		shift = int((t_inj - (wf_times[0] + Tc/2)) * fw)
+		hp = np.roll(hp.value, shift)
+		
+		hp = TimeSeries(hp, t0=times[0], dt=hdata.dt)
+		try:
+			hp = hp.taper()
+		except:
+			pass
+
+		injected_data = data.inject(hp)
+
+	else:
+		injected_data = inject(data, t_inj, inj_type, inj_params)
 
 	cond_data = condition_data(injected_data, To, fw, window, qtrans, qsplit, dT)
 

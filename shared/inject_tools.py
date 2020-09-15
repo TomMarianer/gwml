@@ -229,19 +229,19 @@ def load_inject_condition_ccsn(t_i, t_f, t_inj, ra, dec, ccsn_paper, ccsn_file, 
 	fp, fc = det_obj.antenna_pattern(ra, dec, 0, t_inj)
 
 	wfs_path = Path(git_path + '/shared/ccsn_wfs/' + ccsn_paper)
-	data = [i.strip().split() for i in open(join(wfs_path, ccsn_file)).readlines()]
+	sim_data = [i.strip().split() for i in open(join(wfs_path, ccsn_file)).readlines()]
 	if ccsn_paper == 'radice':
 		line_s = 1
 	else:
 		line_s = 0
 
 	D = D_kpc *  3.086e+21 # cm
-	sim_times = np.asarray([float(dat[0]) for dat in data[line_s:]])
-	hp = np.asarray([float(dat[1]) for dat in data[line_s:]]) / D
+	sim_times = np.asarray([float(dat[0]) for dat in sim_data[line_s:]])
+	hp = np.asarray([float(dat[1]) for dat in sim_data[line_s:]]) / D
 	if ccsn_paper == 'abdikamalov':
 		hc = np.zeros(hp.shape)
 	else:
-		hc = np.asarray([float(dat[2]) for dat in data[line_s:]]) / D
+		hc = np.asarray([float(dat[2]) for dat in sim_data[line_s:]]) / D
 
 	dt = sim_times[1] - sim_times[0]
 	h = fp * hp + fc * hc

@@ -152,7 +152,6 @@ def load_inject_condition(t_i, t_f, t_inj, inj_type, inj_params=None, local=Fals
 						  qtrans=False, qsplit=False, dT=2.0, hp=None, save=False, data_path=None):
 	"""Fucntion to load a chunk, inject a waveform and condition, created to enable parallelizing.
 	"""
-	print(detector)
 	if local:
 		files = get_files(detector)
 		try:

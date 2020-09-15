@@ -4,6 +4,7 @@ tools for loading and conditioning strain data, and generating spectrograms
 parallel version
 """
 
+import git
 from gwosc.datasets import event_gps
 from gwpy.timeseries import TimeSeries
 from gwpy.frequencyseries import FrequencySeries
@@ -14,13 +15,23 @@ import numpy as np
 import time
 import astropy.units as units
 from os import listdir, makedirs
-from os.path import isfile, join, exists
+from os.path import isfile, join, exists, dirname, realpath
 import matplotlib.pyplot as plt
 from tqdm import tqdm, tqdm_notebook
 from skimage.transform import resize
 from pathlib import Path
 import h5py
 import multiprocessing as mp
+
+def get_git_root(path):
+	"""Get git root path
+	"""
+	git_repo = git.Repo(path, search_parent_directories=True)
+	git_root = git_repo.git.rev_parse("--show-toplevel")
+	return git_root
+
+file_path = dirname(realpath(__file__))
+git_path = get_git_root(file_path)
 
 def get_segment_list(detector='H'):
 	"""
@@ -29,7 +40,7 @@ def get_segment_list(detector='H'):
 	output: segment_list - list of segments of times when the given detector was active
 	"""
 
-	data_path = Path('../segment_files')
+	data_path = Path(git_path + '/astrophys/segment_files')
 	if detector == 'BOTH':
 		# filename = join(data_path, 'O1_' + detector + '_DATA')
 		filename = join(data_path, 'O1_O2_' + detector + '_DATA')

@@ -1,14 +1,27 @@
 #!/usr/bin/python
 
+import git
+import numpy as np
+import pandas as pd
+from os.path import isfile, join, exists, dirname, realpath
 from gwosc.datasets import event_gps
 from gwpy.timeseries import TimeSeries
 from scipy.signal import chirp, iirdesign, filtfilt
 from numpy.random import randn
-import numpy as np
-import pandas as pd
-# import sys
-# sys.path.append('/storage/home/tommaria/thesis/tools')
-# from tools_gs_par import *
+
+def get_git_root(path):
+	"""Get git root path
+	"""
+	git_repo = git.Repo(path, search_parent_directories=True)
+	git_root = git_repo.git.rev_parse("--show-toplevel")
+	return git_root
+
+file_path = dirname(realpath(__file__))
+git_path = get_git_root(file_path)
+
+import sys
+sys.path.append(git_path + '/astrophys/tools')
+from tools_gs_par import *
 
 def gaussian_env(times, t_inj, tau):
 	"""Generate gaussian envelope.
@@ -135,7 +148,7 @@ def inject(data, t_inj, inj_type, inj_params):
 	return injected_data
 
 def load_inject_condition(t_i, t_f, t_inj, inj_type, inj_params=None, local=False, Tc=16, To=2, fw=2048, window='tukey', detector='H', 
-						  qtrans=False, qsplit=False, dT=2.0, save=False, data_path=None, hp=None):
+						  qtrans=False, qsplit=False, dT=2.0, hp=None, save=False, data_path=None):
 	"""Fucntion to load a chunk, inject a waveform and condition, created to enable parallelizing.
 	"""
 	if local:
@@ -161,7 +174,7 @@ def load_inject_condition(t_i, t_f, t_inj, inj_type, inj_params=None, local=Fals
 		shift = int((t_inj - (wf_times[0] + Tc/2)) * fw)
 		hp = np.roll(hp.value, shift)
 		
-		hp = TimeSeries(hp, t0=times[0], dt=hdata.dt)
+		hp = TimeSeries(hp, t0=wf_times[0], dt=data.dt)
 		try:
 			hp = hp.taper()
 		except:

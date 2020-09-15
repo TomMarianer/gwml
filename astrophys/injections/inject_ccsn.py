@@ -66,7 +66,7 @@ wfs_path = Path(git_path + '/shared/ccsn_wfs/' + ccsn_paper)
 ccsn_files = [f for f in sorted(listdir(wfs_path)) if isfile(join(wfs_path, f))]
 
 h_rss = []
-print(69, detector)
+
 for ccsn_file in ccsn_files[:1]:
 	for D_kpc in [0.2, 0.5, 1, 3, 5, 7, 10]:
 		results = pool.starmap(load_inject_condition_ccsn, [(t[0], t[1], t[2], t[3], t[4], ccsn_paper, ccsn_file, D_kpc, local, Tc, To, fw, 

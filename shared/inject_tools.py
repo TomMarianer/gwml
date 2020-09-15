@@ -204,7 +204,7 @@ def load_inject_condition(t_i, t_f, t_inj, inj_type, inj_params=None, local=Fals
 	times = times[idx]
 	return x, times
 
-def load_inject_condition_ccsn(t_i, t_f, t_inj, ra, dec, ccsn_paper, wf_file, D_kpc=10, local=False, Tc=16, To=2, fw=2048, window='tukey', detector='H', 
+def load_inject_condition_ccsn(t_i, t_f, t_inj, ra, dec, ccsn_paper, ccsn_file, D_kpc=10, local=False, Tc=16, To=2, fw=2048, window='tukey', detector='H', 
 						  qtrans=False, qsplit=False, dT=2.0, save=False, data_path=None):
 	"""Fucntion to load a chunk, inject a waveform and condition, created to enable parallelizing.
 	"""

@@ -226,6 +226,8 @@ def load_inject_condition_ccsn(t_i, t_f, t_inj, ra, dec, ccsn_paper, ccsn_file, 
 		return
 
 	det_obj = Detector(detector + '1')
+	delay = det_obj.time_delay_from_detector(Detector('H1'), ra, dec, t_inj)
+	t_inj += delay
 	fp, fc = det_obj.antenna_pattern(ra, dec, 0, t_inj)
 
 	wfs_path = Path(git_path + '/shared/ccsn_wfs/' + ccsn_paper)

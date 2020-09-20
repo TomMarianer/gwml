@@ -6,8 +6,8 @@ also includes several miscellaneous tools, and tools for unused outlier detectio
 """
 
 import h5py
-from os import listdir
-from os.path import isfile, join
+from os import listdir, makedirs
+from os.path import isfile, join, exists
 import numpy as np
 import pandas as pd
 from umap import UMAP

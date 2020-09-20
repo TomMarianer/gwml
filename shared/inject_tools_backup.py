@@ -107,10 +107,11 @@ def find_segment(t, segment_list):
 			return segment
 	return None
 
-def gen_inject(wf_times, t_inj, alpha, inj_type, inj_params):
+def inject(data, t_inj, inj_type, inj_params):
 	"""Inject waveform to data
 	"""
 
+	wf_times = data.times.value
 	if inj_type == 'sg':
 		Hp, Hc = sine_gaussian(wf_times, t_inj, inj_params['f0'], inj_params['Q'])
 
@@ -142,23 +143,13 @@ def gen_inject(wf_times, t_inj, alpha, inj_type, inj_params):
 	elif inj_type == 'wn':
 		Hp, Hc = white_noise(wf_times, t_inj, inj_params['f_low'], inj_params['f_high'], inj_params['tau'])
 
-	hp, hc = gen_waveform(inj_params['A'], alpha, Hp, Hc)
+	hp, hc = gen_waveform(inj_params['A'], inj_params['alpha'], Hp, Hc)
 	hp = TimeSeries(hp, t0=wf_times[0], dt=data.dt)
-	hc = TimeSeries(hc, t0=times[0], dt=hdata.dt)
-	try:
-		hp = hp.taper()
-		hc = hc.taper()
+	injected_data = data.inject(hp)
+	return injected_data
 
-	except:
-		pass
-
-	h_rss = np.sqrt((hp.dot(hp) + hc.dot(hc)) * hp.dt).value
-	hp *= inj_params['A'] / h_rss
-	hc *= inj_params['A'] / h_rss
-	return hp, hc
-
-def load_inject_condition(t_i, t_f, t_inj, ra, dec, pol, alpha, inj_type, inj_params=None, local=False, Tc=16, To=2, fw=2048, 
-						  window='tukey', detector='H', qtrans=False, qsplit=False, dT=2.0, hp=None, save=False, data_path=None):
+def load_inject_condition(t_i, t_f, t_inj, inj_type, inj_params=None, local=False, Tc=16, To=2, fw=2048, window='tukey', detector='H', 
+						  qtrans=False, qsplit=False, dT=2.0, hp=None, save=False, data_path=None):
 	"""Fucntion to load a chunk, inject a waveform and condition, created to enable parallelizing.
 	"""
 	if local:
@@ -178,16 +169,22 @@ def load_inject_condition(t_i, t_f, t_inj, ra, dec, pol, alpha, inj_type, inj_pa
 	if np.isnan(data.value).any():
 		return
 
-	det_obj = Detector(detector + '1')
-	delay = det_obj.time_delay_from_detector(Detector('H1'), ra, dec, t_inj)
-	t_inj += delay
-	fp, fc = det_obj.antenna_pattern(ra, dec, pol, t_inj)
-
 	wf_times = data.times.value
 
-	hp, hc = gen_inject(wf_times, t_inj, alpha, inj_type, inj_params)
-	h = fp * hp + fc * hc
-	injected_data = data.inject(h)
+	if inj_type == 'ccsn':
+		shift = int((t_inj - (wf_times[0] + Tc/2)) * fw)
+		hp = np.roll(hp.value, shift)
+		
+		hp = TimeSeries(hp, t0=wf_times[0], dt=data.dt)
+		try:
+			hp = hp.taper()
+		except:
+			pass
+
+		injected_data = data.inject(hp)
+
+	else:
+		injected_data = inject(data, t_inj, inj_type, inj_params)
 
 	cond_data = condition_data(injected_data, To, fw, window, qtrans, qsplit, dT)
 
@@ -207,8 +204,8 @@ def load_inject_condition(t_i, t_f, t_inj, ra, dec, pol, alpha, inj_type, inj_pa
 	times = times[idx]
 	return x, times
 
-def load_inject_condition_ccsn(t_i, t_f, t_inj, ra, dec, pol, ccsn_paper, ccsn_file, D_kpc=10, local=False, Tc=16, To=2, fw=2048, 
-							   window='tukey', detector='H', qtrans=False, qsplit=False, dT=2.0, save=False, data_path=None):
+def load_inject_condition_ccsn(t_i, t_f, t_inj, ra, dec, ccsn_paper, ccsn_file, D_kpc=10, local=False, Tc=16, To=2, fw=2048, window='tukey', detector='H', 
+						  qtrans=False, qsplit=False, dT=2.0, save=False, data_path=None):
 	"""Fucntion to load a chunk, inject a waveform and condition, created to enable parallelizing.
 	"""
 	if local:
@@ -231,7 +228,7 @@ def load_inject_condition_ccsn(t_i, t_f, t_inj, ra, dec, pol, ccsn_paper, ccsn_f
 	det_obj = Detector(detector + '1')
 	delay = det_obj.time_delay_from_detector(Detector('H1'), ra, dec, t_inj)
 	t_inj += delay
-	fp, fc = det_obj.antenna_pattern(ra, dec, pol, t_inj)
+	fp, fc = det_obj.antenna_pattern(ra, dec, 0, t_inj)
 
 	wfs_path = Path(git_path + '/shared/ccsn_wfs/' + ccsn_paper)
 	sim_data = [i.strip().split() for i in open(join(wfs_path, ccsn_file)).readlines()]

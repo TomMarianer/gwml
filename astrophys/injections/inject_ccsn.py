@@ -53,7 +53,7 @@ for i, t_inj in enumerate(inj_df['H'][:15]): # only use H injection times, calcu
 	chunk = find_segment(t_inj, chunk_list)
 	chunks.append(find_segment(t_inj, chunk_list))
 	inj_times.append(t_inj)
-	times_par.append((chunk[0], chunk[1], t_inj, sky_loc['ra'][i], sky_loc['dec'][i]))
+	times_par.append((chunk[0], chunk[1], t_inj, sky_loc['ra'][i], sky_loc['dec'][i], sky_loc['pol'][i]))
 
 # pool = mp.Pool(mp.cpu_count() - 1)
 pool = mp.Pool(15)
@@ -73,8 +73,8 @@ for ccsn_file in ccsn_files[40:41]:
 	# for D_kpc in [0.01, 0.1, 0.2, 0.5, 1, 3, 5, 7, 10]:
 	# for D_kpc in [0.01, 0.1, 0.2, 0.5, 1, 3, 5, 7]:
 	for D_kpc in [3, 5, 7, 10]:
-		results = pool.starmap(load_inject_condition_ccsn, [(t[0], t[1], t[2], t[3], t[4], ccsn_paper, ccsn_file, D_kpc, local, Tc, To, fw, 
-							   'tukey', detector, qtrans, qsplit, dT) for t in times_par])
+		results = pool.starmap(load_inject_condition_ccsn, [(t[0], t[1], t[2], t[3], t[4], t[5], ccsn_paper, ccsn_file, 
+							   D_kpc, local, Tc, To, fw, 'tukey', detector, qtrans, qsplit, dT) for t in times_par])
 
 		x = []
 		times = []

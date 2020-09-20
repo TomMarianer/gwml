@@ -54,8 +54,8 @@ for i, t_inj in enumerate(inj_df['H'][:15]): # only use H injection times, calcu
 	inj_times.append(t_inj)
 	times_par.append((chunk[0], chunk[1], t_inj, sky_loc['ra'][i], sky_loc['dec'][i], sky_loc['pol'][i], sky_loc['alpha'][i]))
 
-pool = mp.Pool(mp.cpu_count() - 1)
-# pool = mp.Pool(15)
+# pool = mp.Pool(mp.cpu_count() - 1)
+pool = mp.Pool(15)
 
 num_s = 19
 num_e = 20

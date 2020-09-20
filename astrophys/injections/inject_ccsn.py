@@ -36,7 +36,7 @@ params_path = Path(git_path + '/shared/injection_params')
 inj_df = pd.read_csv(join(params_path, 'soft_inj_time.csv'), usecols=['H']) #usecols=[detector])
 # inj_df = pd.read_csv(join(params_path, 'soft_inj_time_no_constraint.csv'), usecols=['H']) #usecols=[detector])
 
-sky_loc = pd.read_csv(join(params_path, 'sky_loc_csv.csv'), usecols=['ra', 'dec'])
+sky_loc = pd.read_csv(join(params_path, 'sky_loc_csv.csv'), usecols=['ra', 'dec', 'pol'])
 
 start_time = time.time()
 

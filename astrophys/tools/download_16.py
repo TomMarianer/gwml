@@ -3,6 +3,20 @@
 script for downloading bulk ligo data
 """
 
+import git
+from os import listdir
+from os.path import isfile, join, dirname, realpath
+
+def get_git_root(path):
+	"""Get git root path
+	"""
+	git_repo = git.Repo(path, search_parent_directories=True)
+	git_root = git_repo.git.rev_parse("--show-toplevel")
+	return git_root
+
+file_path = dirname(realpath(__file__))
+git_path = get_git_root(file_path)
+
 # Standard python numerical analysis imports:
 import numpy as np
 from scipy import signal
@@ -39,7 +53,7 @@ def download(url, detector):
 		urllib.request.urlretrieve(url, filename)  
 	#print("File download complete")
 
-data_path = Path('../bulk_data_urls')
+data_path = Path(git_path + '/astrophys/bulk_data_urls')
 urls = dict()
 for detector in ['H1', 'L1']:
 	filename = 'O1_16KHZ' + '_' + detector + '_' + 'files'

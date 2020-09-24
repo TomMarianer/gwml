@@ -8,12 +8,26 @@ Created on Sun Dec 15 17:39:36 2019
 script for generating spectrograms of the gravityspy glitch dataset from raw strain data
 """
 
+import git
+from os import listdir
+from os.path import isfile, join, dirname, realpath
+
+def get_git_root(path):
+	"""Get git root path
+	"""
+	git_repo = git.Repo(path, search_parent_directories=True)
+	git_root = git_repo.git.rev_parse("--show-toplevel")
+	return git_root
+
+file_path = dirname(realpath(__file__))
+git_path = get_git_root(file_path)
+
 import matplotlib
 matplotlib.use('TkAgg')
 
 import sys
 # sys.path.append('/storage/home/tommaria/thesis/tools')
-sys.path.append('../tools')
+sys.path.append(git_path + '/astrophys/tools')
 from tools_gs import *
 from params import *
 import pandas as pd

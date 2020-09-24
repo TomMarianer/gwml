@@ -3,12 +3,26 @@
 scirpt for extracting spectrograms of the time-stamps flagged as outliers and saving them to a single file
 """
 
+import git
+from os import listdir
+from os.path import isfile, join, dirname, realpath
+
+def get_git_root(path):
+	"""Get git root path
+	"""
+	git_repo = git.Repo(path, search_parent_directories=True)
+	git_root = git_repo.git.rev_parse("--show-toplevel")
+	return git_root
+
+file_path = dirname(realpath(__file__))
+git_path = get_git_root(file_path)
+
 import matplotlib
 matplotlib.use('TkAgg')
 
 import sys
 # sys.path.append('/storage/home/tommaria/thesis/tools')
-sys.path.append('../tools')
+sys.path.append(git_path + '/astrophys/tools')
 from tools_gs_par import *
 
 def find_file(t, files):

@@ -3,6 +3,9 @@
 import git
 import numpy as np
 import pandas as pd
+import psutil
+import gc
+import sys
 from os.path import isfile, join, exists, dirname, realpath
 from gwosc.datasets import event_gps
 from gwpy.timeseries import TimeSeries
@@ -107,7 +110,7 @@ def find_segment(t, segment_list):
 			return segment
 	return None
 
-def gen_inject(wf_times, t_inj, alpha, inj_type, inj_params):
+def gen_inject(wf_times, dt, t_inj, alpha, inj_type, inj_params):
 	"""Inject waveform to data
 	"""
 
@@ -143,8 +146,8 @@ def gen_inject(wf_times, t_inj, alpha, inj_type, inj_params):
 		Hp, Hc = white_noise(wf_times, t_inj, inj_params['f_low'], inj_params['f_high'], inj_params['tau'])
 
 	hp, hc = gen_waveform(inj_params['A'], alpha, Hp, Hc)
-	hp = TimeSeries(hp, t0=wf_times[0], dt=data.dt)
-	hc = TimeSeries(hc, t0=times[0], dt=hdata.dt)
+	hp = TimeSeries(hp, t0=wf_times[0], dt=dt)
+	hc = TimeSeries(hc, t0=wf_times[0], dt=dt)
 	try:
 		hp = hp.taper()
 		hc = hc.taper()
@@ -161,6 +164,13 @@ def load_inject_condition(t_i, t_f, t_inj, ra, dec, pol, alpha, inj_type, inj_pa
 						  window='tukey', detector='H', qtrans=False, qsplit=False, dT=2.0, hp=None, save=False, data_path=None):
 	"""Fucntion to load a chunk, inject a waveform and condition, created to enable parallelizing.
 	"""
+	vmem = psutil.virtual_memory()
+	free_mem = vmem.free >> 20
+	avail_mem = vmem.available >> 20
+	# if free_mem < 3e5:
+	if avail_mem < 3e5:
+		return
+
 	if local:
 		files = get_files(detector)
 		try:
@@ -185,11 +195,17 @@ def load_inject_condition(t_i, t_f, t_inj, ra, dec, pol, alpha, inj_type, inj_pa
 
 	wf_times = data.times.value
 
-	hp, hc = gen_inject(wf_times, t_inj, alpha, inj_type, inj_params)
+	hp, hc = gen_inject(wf_times, data.dt, t_inj, alpha, inj_type, inj_params)
 	h = fp * hp + fc * hc
 	injected_data = data.inject(h)
 
+	del data
+	gc.collect()
+
 	cond_data = condition_data(injected_data, To, fw, window, qtrans, qsplit, dT)
+
+	del injected_data
+	gc.collect()
 
 	x = []
 	times = []
@@ -198,6 +214,9 @@ def load_inject_condition(t_i, t_f, t_inj, ra, dec, pol, alpha, inj_type, inj_pa
 		x.append(dat.values)
 		times.append(dat.t0)
 
+	del cond_data
+	gc.collect()
+
 	x = np.asarray(x)
 	times = np.asarray(times)
 
@@ -205,12 +224,55 @@ def load_inject_condition(t_i, t_f, t_inj, ra, dec, pol, alpha, inj_type, inj_pa
 
 	x = x[idx]
 	times = times[idx]
+
 	return x, times
 
-def load_inject_condition_ccsn(t_i, t_f, t_inj, ra, dec, pol, ccsn_paper, ccsn_file, D_kpc=10, local=False, Tc=16, To=2, fw=2048, 
+def prep_ccsn(h, sim_times, Tc, fw):
+	"""Function to prepare a single polarization of a simulated ccsn waveform - resample, high pass filter and window
+	"""
+	dt = sim_times[1] - sim_times[0]
+	h = TimeSeries(h, t0=sim_times[0], dt=dt)
+	h = h.resample(rate=fw, ftype = 'iir', n=20) # downsample to working frequency fw
+	h = h.highpass(frequency=11, filtfilt=True) # filter out frequencies below 20Hz
+	inj_window = scisig.tukey(M=len(h), alpha=0.08, sym=True)
+	h = h * inj_window
+	h = h.pad(int((fw * Tc - len(h)) / 2))
+	return h
+
+
+def load_ccsn_wf(ccsn_paper, ccsn_file, Tc, fw):
+	"""Function to load a simulated ccsn waveform and prepare it for injection
+	"""
+	wfs_path = Path(git_path + '/shared/ccsn_wfs/' + ccsn_paper)
+	sim_data = [i.strip().split() for i in open(join(wfs_path, ccsn_file)).readlines()]
+	if ccsn_paper == 'radice':
+		line_s = 1
+	else:
+		line_s = 0
+
+	# D = D_kpc *  3.086e+21 # cm
+	sim_times = np.asarray([float(dat[0]) for dat in sim_data[line_s:]])
+	hp = np.asarray([float(dat[1]) for dat in sim_data[line_s:]])
+	if ccsn_paper == 'abdikamalov':
+		hc = np.zeros(hp.shape)
+	else:
+		hc = np.asarray([float(dat[2]) for dat in sim_data[line_s:]])
+
+	hp = prep_ccsn(hp, sim_times, Tc, fw)
+	hc = prep_ccsn(hc, sim_times, Tc, fw)
+	return hp, hc
+
+def load_inject_condition_ccsn(t_i, t_f, t_inj, ra, dec, pol, hp, hc, local=False, Tc=16, To=2, fw=2048, 
 							   window='tukey', detector='H', qtrans=False, qsplit=False, dT=2.0, save=False, data_path=None):
 	"""Fucntion to load a chunk, inject a waveform and condition, created to enable parallelizing.
 	"""
+	vmem = psutil.virtual_memory()
+	free_mem = vmem.free >> 20
+	avail_mem = vmem.available >> 20
+	# if free_mem < 3e5:
+	if avail_mem < 3e5:
+		return
+
 	if local:
 		files = get_files(detector)
 		try:
@@ -233,30 +295,31 @@ def load_inject_condition_ccsn(t_i, t_f, t_inj, ra, dec, pol, ccsn_paper, ccsn_f
 	t_inj += delay
 	fp, fc = det_obj.antenna_pattern(ra, dec, pol, t_inj)
 
-	wfs_path = Path(git_path + '/shared/ccsn_wfs/' + ccsn_paper)
-	sim_data = [i.strip().split() for i in open(join(wfs_path, ccsn_file)).readlines()]
-	if ccsn_paper == 'radice':
-		line_s = 1
-	else:
-		line_s = 0
+	# wfs_path = Path(git_path + '/shared/ccsn_wfs/' + ccsn_paper)
+	# sim_data = [i.strip().split() for i in open(join(wfs_path, ccsn_file)).readlines()]
+	# if ccsn_paper == 'radice':
+	# 	line_s = 1
+	# else:
+	# 	line_s = 0
 
-	D = D_kpc *  3.086e+21 # cm
-	sim_times = np.asarray([float(dat[0]) for dat in sim_data[line_s:]])
-	hp = np.asarray([float(dat[1]) for dat in sim_data[line_s:]]) / D
-	if ccsn_paper == 'abdikamalov':
-		hc = np.zeros(hp.shape)
-	else:
-		hc = np.asarray([float(dat[2]) for dat in sim_data[line_s:]]) / D
+	# D = D_kpc *  3.086e+21 # cm
+	# sim_times = np.asarray([float(dat[0]) for dat in sim_data[line_s:]])
+	# hp = np.asarray([float(dat[1]) for dat in sim_data[line_s:]]) / D
+	# if ccsn_paper == 'abdikamalov':
+	# 	hc = np.zeros(hp.shape)
+	# else:
+	# 	hc = np.asarray([float(dat[2]) for dat in sim_data[line_s:]]) / D
 
-	dt = sim_times[1] - sim_times[0]
+	# dt = sim_times[1] - sim_times[0]
 	h = fp * hp + fc * hc
-	h = TimeSeries(h, t0=sim_times[0], dt=dt)
+	# h = TimeSeries(h, t0=sim_times[0], dt=dt)
 
-	h = h.resample(rate=fw, ftype = 'iir', n=20) # downsample to working frequency fw
-	h = h.highpass(frequency=11, filtfilt=True) # filter out frequencies below 20Hz
-	inj_window = scisig.tukey(M=len(h), alpha=0.08, sym=True)
-	h = h * inj_window
-	h = h.pad(int((fw * Tc - len(h)) / 2))
+	# h = h.resample(rate=fw, ftype = 'iir', n=20) # downsample to working frequency fw
+	# h = h.highpass(frequency=11, filtfilt=True) # filter out frequencies below 20Hz
+	# inj_window = scisig.tukey(M=len(h), alpha=0.08, sym=True)
+	# h = h * inj_window
+
+	# h = h.pad(int((fw * Tc - len(h)) / 2))
 
 	wf_times = data.times.value
 
@@ -271,8 +334,13 @@ def load_inject_condition_ccsn(t_i, t_f, t_inj, ra, dec, pol, ccsn_paper, ccsn_f
 
 	injected_data = data.inject(h)
 
+	del data
+	gc.collect()
 	
 	cond_data = condition_data(injected_data, To, fw, window, qtrans, qsplit, dT)
+
+	del injected_data
+	gc.collect()
 
 	x = []
 	times = []
@@ -280,6 +348,9 @@ def load_inject_condition_ccsn(t_i, t_f, t_inj, ra, dec, pol, ccsn_paper, ccsn_f
 	for dat in cond_data:
 		x.append(dat.values)
 		times.append(dat.t0)
+
+	del cond_data
+	gc.collect()
 
 	x = np.asarray(x)
 	times = np.asarray(times)

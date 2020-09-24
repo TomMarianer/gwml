@@ -1,12 +1,28 @@
 #!/usr/bin/python3
 
+import psutil
+import gc
+
+import git
+from os import listdir
+from os.path import isfile, join, dirname, realpath
+
+def get_git_root(path):
+	"""Get git root path
+	"""
+	git_repo = git.Repo(path, search_parent_directories=True)
+	git_root = git_repo.git.rev_parse("--show-toplevel")
+	return git_root
+
+file_path = dirname(realpath(__file__))
+git_path = get_git_root(file_path)
+
 import sys
-# sys.path.append('/storage/home/tommaria/thesis/tools')
-sys.path.append('../tools')
+sys.path.append(git_path + '/astrophys/tools')
 from tools_gs_par import *
 from params import *
 
-sys.path.append('../../shared')
+sys.path.append(git_path + '/shared')
 from inject_tools import *
 
 local = True
@@ -19,20 +35,20 @@ save = True
 # inj_type = 'sg'
 # inj_type = 'rd'
 # inj_type = 'ga'
-# inj_type = 'cg'
+inj_type = 'cg'
 # inj_type = 'cg_inc'
-inj_type = 'cg_double'
+# inj_type = 'cg_double'
 # inj_type = 'wn'
 
 segment_list = get_segment_list('BOTH')
 detector = 'L'
 files = get_files(detector)
 
-params_path = Path('../../shared/injection_params')
+params_path = Path(git_path + '/shared/injection_params')
 
 ### choose injection times (either with or without the constraint that the times have no glitch in them)
 
-inj_df = pd.read_csv(join(params_path, 'soft_inj_time.csv'), usecols=[detector])
+inj_df = pd.read_csv(join(params_path, 'soft_inj_time.csv'), usecols=['H'])
 # inj_df = pd.read_csv(join(params_path, 'soft_inj_time_no_constraint.csv'), usecols=[detector])
 
 sky_loc = pd.read_csv(join(params_path, 'sky_loc_csv.csv'), usecols=['ra', 'dec', 'pol', 'alpha'])
@@ -55,10 +71,15 @@ for i, t_inj in enumerate(inj_df['H'][:15]): # only use H injection times, calcu
 	times_par.append((chunk[0], chunk[1], t_inj, sky_loc['ra'][i], sky_loc['dec'][i], sky_loc['pol'][i], sky_loc['alpha'][i]))
 
 # pool = mp.Pool(mp.cpu_count() - 1)
-pool = mp.Pool(15)
+# pool = mp.Pool(5)
 
-num_s = 19
-num_e = 20
+vmem = psutil.virtual_memory()
+print('pre-mp', vmem.total >> 20, vmem.available >> 20, vmem.used >> 20, vmem.free >> 20, vmem.percent)
+
+# num_s = 19
+# num_e = 20
+
+num_cnt = 0
 
 ### ugly code right here, should fix sometime. uncomment the injection type you want to use and comment out the rest
 
@@ -70,45 +91,64 @@ num_e = 20
 # 
 # if inj_type == 'rd':
 # 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'tau', 'A'])
-# 	for f_inj, tau, A in zip(params['f0'][num_s:], params['tau'][num_s:], params['A'][num_s:]):
+# 	for f_inj, tau, A in zip(params['f0'], params['tau'], params['A']):
+# 	# for f_inj, tau, A in zip(params['f0'][num_s:num_e], params['tau'][num_s:num_e], params['A'][num_s:num_e]):
 # 		inj_params = {'f0': f_inj, 'tau': tau, 'A': A}
 # 
 # if inj_type == 'ga':
 # 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['tau', 'A'])
-# 	for tau, A in zip(params['tau'][num_s:num_e], params['A'][num_s:num_e]):
-# 			inj_params = {'tau': tau, 'A': A}
+# 	for tau, A in zip(params['tau'], params['A']):
+# 	# for tau, A in zip(params['tau'][num_s:num_e], params['A'][num_s:num_e]):
+# 		inj_params = {'tau': tau, 'A': A}
 # 
-# if inj_type == 'cg':
-# 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
-# 	for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
-# 		inj_params = {'f0': f_inj, 'Q': Q, 'A': A}
-# 
-if inj_type == 'cg_inc':
+if inj_type == 'cg':
 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
-	# for f_inj, Q, A in zip(params['f0'], params['Q'], params['A']):
-	for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
+	for f_inj, Q, A in zip(params['f0'], params['Q'], params['A']):
+	# for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
 		inj_params = {'f0': f_inj, 'Q': Q, 'A': A}
 # 
-# if inj_type == 'cg_double':
+# if inj_type == 'cg_inc':
 # 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
 # 	# for f_inj, Q, A in zip(params['f0'], params['Q'], params['A']):
 # 	for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
 # 		inj_params = {'f0': f_inj, 'Q': Q, 'A': A}
-
+# 
+# if inj_type == 'cg_double':
+# 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
+# 	for f_inj, Q, A in zip(params['f0'], params['Q'], params['A']):
+# 	# for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
+# 		inj_params = {'f0': f_inj, 'Q': Q, 'A': A}
+# 
 # if inj_type == 'wn':
 # 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f_low', 'f_high', 'tau', 'A'])
-# 	# for f_low, f_high, tau, A in zip(params['f_low'], params['f_high'], params['tau'], params['A']):
-# 	for f_low, f_high, tau, A in zip(params['f_low'][num_s:num_e], params['f_high'][num_s:num_e], params['tau'][num_s:num_e], params['A'][num_s:num_e]):
+# 	for f_low, f_high, tau, A in zip(params['f_low'], params['f_high'], params['tau'], params['A']):
+# 	# for f_low, f_high, tau, A in zip(params['f_low'][num_s:num_e], params['f_high'][num_s:num_e], params['tau'][num_s:num_e], params['A'][num_s:num_e]):
 # 		inj_params = {'f_low': f_low, 'f_high': f_high, 'tau': tau, 'A': A}
 # 
+		pool = mp.Pool(15)
 		results = pool.starmap(load_inject_condition, 
 							   [(t[0], t[1], t[2], t[3], t[4], t[5], t[6], inj_type, inj_params, local, Tc, To, fw, window, detector, qtrans, qsplit, dT) for t in times_par])
+
+		vmem = psutil.virtual_memory()
+		print(str(num_cnt) + ' pre-pool.close', vmem.total >> 20, vmem.available >> 20, vmem.used >> 20, vmem.free >> 20, vmem.percent)
+		
+		pool.close()
+		pool.join()
 
 		x = []
 		times = []
 		for result in results:
+			if result is None:
+				sys.exit('not enough available memory')
+
 			x.append(result[0])
 			times.append(result[1])
+
+		vmem = psutil.virtual_memory()
+		print(str(num_cnt) + ' post-pool.close', vmem.total >> 20, vmem.available >> 20, vmem.used >> 20, vmem.free >> 20, vmem.percent)
+
+		del results
+		gc.collect()
 
 		x = np.asarray(x)
 		times = np.asarray(times)
@@ -143,8 +183,10 @@ if inj_type == 'cg_inc':
 		print(x.shape)
 		print(times.shape)
 
-pool.close()
-pool.join()
+		del x, times
+		gc.collect()
+
+		num_cnt += 1
 
 print(detector)
 print('Done')

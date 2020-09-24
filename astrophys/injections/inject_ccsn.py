@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+import psutil
+import gc
+
 import git
 from os import listdir
 from os.path import isfile, join, dirname, realpath
@@ -28,7 +31,7 @@ qsplit = True
 save = True
 
 segment_list = get_segment_list('BOTH')
-detector = 'H'
+detector = 'L'
 files = get_files(detector)
 
 params_path = Path(git_path + '/shared/injection_params')
@@ -56,31 +59,57 @@ for i, t_inj in enumerate(inj_df['H'][:15]): # only use H injection times, calcu
 	times_par.append((chunk[0], chunk[1], t_inj, sky_loc['ra'][i], sky_loc['dec'][i], sky_loc['pol'][i]))
 
 # pool = mp.Pool(mp.cpu_count() - 1)
-pool = mp.Pool(15)
+# pool = mp.Pool(15)
 
 inj_type = 'ccsn'
 inj_params = None
 
-ccsn_paper = 'abdikamalov'
+# ccsn_paper = 'abdikamalov'
 # ccsn_paper = 'andersen'
-# ccsn_paper = 'radice'
+ccsn_paper = 'radice'
 wfs_path = Path(git_path + '/shared/ccsn_wfs/' + ccsn_paper)
 ccsn_files = [f for f in sorted(listdir(wfs_path)) if isfile(join(wfs_path, f))]
 
 h_rss = []
 
-for ccsn_file in ccsn_files[40:41]:
-	# for D_kpc in [0.01, 0.1, 0.2, 0.5, 1, 3, 5, 7, 10]:
+vmem = psutil.virtual_memory()
+print('pre-mp', vmem.total >> 20, vmem.available >> 20, vmem.used >> 20, vmem.free >> 20, vmem.percent)
+
+num_cnt = 0
+
+for ccsn_file in ccsn_files:
+	hp, hc = load_ccsn_wf(ccsn_paper, ccsn_file, Tc, fw)
+	for D_kpc in [0.01, 0.1, 0.2, 0.5, 1, 3, 5, 7, 10]:
 	# for D_kpc in [0.01, 0.1, 0.2, 0.5, 1, 3, 5, 7]:
-	for D_kpc in [3, 5, 7, 10]:
-		results = pool.starmap(load_inject_condition_ccsn, [(t[0], t[1], t[2], t[3], t[4], t[5], ccsn_paper, ccsn_file, 
-							   D_kpc, local, Tc, To, fw, 'tukey', detector, qtrans, qsplit, dT) for t in times_par])
+	# for D_kpc in [3, 5, 7, 10]:
+		D = D_kpc *  3.086e+21 # cm
+		hp_D = hp / D
+		hc_D = hc / D
+
+		pool = mp.Pool(15)
+		results = pool.starmap(load_inject_condition_ccsn, [(t[0], t[1], t[2], t[3], t[4], t[5], hp_D, hc_D, 
+							   local, Tc, To, fw, 'tukey', detector, qtrans, qsplit, dT) for t in times_par])
+
+		vmem = psutil.virtual_memory()
+		print(str(num_cnt) + ' pre-pool.close', vmem.total >> 20, vmem.available >> 20, vmem.used >> 20, vmem.free >> 20, vmem.percent)
+		
+		pool.close()
+		pool.join()
 
 		x = []
 		times = []
 		for result in results:
+			if result is None:
+				sys.exit('not enough available memory')
+
 			x.append(result[0])
 			times.append(result[1])
+
+		vmem = psutil.virtual_memory()
+		print(str(num_cnt) + ' post-pool.close', vmem.total >> 20, vmem.available >> 20, vmem.used >> 20, vmem.free >> 20, vmem.percent)
+
+		del results
+		gc.collect()
 
 		x = np.asarray(x)
 		times = np.asarray(times)
@@ -106,8 +135,10 @@ for ccsn_file in ccsn_files[40:41]:
 		print(x.shape)
 		print(times.shape)
 
-pool.close()
-pool.join()
+		del x, times
+		gc.collect()
+
+		num_cnt += 1
 
 print(detector)
 print('Done')

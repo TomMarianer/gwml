@@ -4,6 +4,20 @@ script for training a cnn on the spectrograms generated of the gravityspy glitch
 using the transfer learning method
 """
 
+import git
+from os import listdir
+from os.path import isfile, join, dirname, realpath
+
+def get_git_root(path):
+	"""Get git root path
+	"""
+	git_repo = git.Repo(path, search_parent_directories=True)
+	git_root = git_repo.git.rev_parse("--show-toplevel")
+	return git_root
+
+file_path = dirname(realpath(__file__))
+git_path = get_git_root(file_path)
+
 import os
 from os import listdir
 from os.path import isfile, join
@@ -22,7 +36,7 @@ from keras.callbacks import ModelCheckpoint
 from keras_tqdm import TQDMCallback
 from sklearn.preprocessing import LabelEncoder
 import sys
-sys.path.append('../tools')
+sys.path.append(git_path + '/power/tools')
 from gsparams import *
 
 data_path = Path('/dovilabfs/work/tommaria/gw/data/gravityspy/fromraw')

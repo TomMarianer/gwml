@@ -3,9 +3,23 @@
 script for evaluating the trained network
 """
 
+import git
+from os import listdir
+from os.path import isfile, join, dirname, realpath
+
+def get_git_root(path):
+	"""Get git root path
+	"""
+	git_repo = git.Repo(path, search_parent_directories=True)
+	git_root = git_repo.git.rev_parse("--show-toplevel")
+	return git_root
+
+file_path = dirname(realpath(__file__))
+git_path = get_git_root(file_path)
+
 import sys
 # sys.path.append('/dovilabfs/work/tommaria/gw/tools')
-sys.path.append('../tools')
+sys.path.append(git_path + '/power/tools')
 from gstools import *
 from gsparams import *
 

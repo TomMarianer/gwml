@@ -10,9 +10,9 @@ import h5py
 # inj_type = 'sg'
 # inj_type = 'rd'
 # inj_type = 'ga'
-# inj_type = 'cg'
+inj_type = 'cg'
 # inj_type = 'cg_inc'
-inj_type = 'cg_double'
+# inj_type = 'cg_double'
 # inj_type = 'wn'
 
 detector = 'L'
@@ -41,7 +41,7 @@ data_path = Path('/storage/fast/users/tommaria/data/conditioned_data/16KHZ/' + d
 if not exists(data_path):
 	makedirs(data_path)
 
-if inj_type == 'cg_inc' or inj_type == 'cg_double':
+if inj_type == 'cg_inc' or inj_type == 'cg_double' or inj_type == 'cg':
 	fname = '-'.join(files[0].split('-')[:-2]) + '.hdf5'
 
 print(fname)

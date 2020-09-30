@@ -35,13 +35,13 @@ save = True
 # inj_type = 'sg'
 # inj_type = 'rd'
 # inj_type = 'ga'
-# inj_type = 'cg'
+inj_type = 'cg'
 # inj_type = 'cg_inc'
-inj_type = 'cg_double'
+# inj_type = 'cg_double'
 # inj_type = 'wn'
 
 segment_list = get_segment_list('BOTH')
-detector = 'L'
+detector = 'H'
 files = get_files(detector)
 
 params_path = Path(git_path + '/shared/injection_params')
@@ -60,11 +60,12 @@ start_time = time.time()
 # num_s = 19
 # num_e = 20
 
-# for num_s in [9, 10, 11, 17, 18, 19]:
-for num_s in [19]:
+# for num_s in [9, 10, 11, 17, 18, 19]: # cg_double
+# for num_s in [0, 7, 21, 41]: # cg
+for num_s in [21, 41]:
 	num_e = num_s + 1
-	# for meta_start in [0, 100, 200, 300, 400, 500, 600, 700, 800, 900]:
-	for meta_start in [500, 600, 700, 800, 900]:
+	for meta_start in [0, 100, 200, 300, 400, 500, 600, 700, 800, 900]:
+	# for meta_start in [500, 600, 700, 800, 900]:
 		for start in [0, 25, 50, 75]:
 			times_par = []
 			inj_times = []
@@ -106,11 +107,11 @@ for num_s in [19]:
 			# 	# for tau, A in zip(params['tau'][num_s:num_e], params['A'][num_s:num_e]):
 			# 		inj_params = {'tau': tau, 'A': A}
 
-			# if inj_type == 'cg':
-			# 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
-			# 	for f_inj, Q, A in zip(params['f0'], params['Q'], params['A']):
-			# 	# for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
-			# 		inj_params = {'f0': f_inj, 'Q': Q, 'A': A}
+			if inj_type == 'cg':
+				params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
+				# for f_inj, Q, A in zip(params['f0'], params['Q'], params['A']):
+				for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
+					inj_params = {'f0': f_inj, 'Q': Q, 'A': A}
 			# 
 			# if inj_type == 'cg_inc':
 			# 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
@@ -118,11 +119,11 @@ for num_s in [19]:
 			# 	for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
 			# 		inj_params = {'f0': f_inj, 'Q': Q, 'A': A}
 			# 
-			if inj_type == 'cg_double':
-				params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
-				# for f_inj, Q, A in zip(params['f0'], params['Q'], params['A']):
-				for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
-					inj_params = {'f0': f_inj, 'Q': Q, 'A': A}
+			# if inj_type == 'cg_double':
+			# 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
+			# 	# for f_inj, Q, A in zip(params['f0'], params['Q'], params['A']):
+			# 	for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
+			# 		inj_params = {'f0': f_inj, 'Q': Q, 'A': A}
 			# 
 			# if inj_type == 'wn':
 			# 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f_low', 'f_high', 'tau', 'A'])

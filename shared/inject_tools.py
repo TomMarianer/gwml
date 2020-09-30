@@ -91,10 +91,11 @@ def white_noise(times, t_inj, f_low, f_high, tau, fs=4096*4):
 	"""Generate white noise waveform
 	"""
 	env = gaussian_env(times, t_inj, tau)
-	sig = randn(len(times))
+	sig_p = randn(len(times))
+	sig_c = randn(len(times))
 	b, a = iirdesign(wp=(f_low, f_high), ws=(f_low * 2/3., min(f_high * 1.5, fs/2.)), gpass=2, gstop=30, fs=fs)
-	Hp = env * filtfilt(b, a, sig)
-	Hc = Hp
+	Hp = env * filtfilt(b, a, sig_p)
+	Hc = env * filtfilt(b, a, sig_c)
 	return Hp, Hc
 
 def gen_waveform(A, alpha, Hp, Hc):
@@ -110,7 +111,7 @@ def find_segment(t, segment_list):
 			return segment
 	return None
 
-def gen_inject(wf_times, dt, t_inj, alpha, inj_type, inj_params):
+def gen_inject(wf_times, dt, t_inj, alpha, inj_type, inj_params, Tc, fw):
 	"""Inject waveform to data
 	"""
 
@@ -143,8 +144,16 @@ def gen_inject(wf_times, dt, t_inj, alpha, inj_type, inj_params):
 									inj_params['f0'] * 20, a, f2, inj_params['Q'], method='linear')
 
 	elif inj_type == 'wn':
-		Hp, Hc = white_noise(wf_times, t_inj, inj_params['f_low'], inj_params['f_high'], inj_params['tau'])
+		params_path = Path(git_path + '/shared/injection_params')
+		with h5py.File(join(params_path, 'wn_f_low_' + str(f_low) + '_f_high_' + str(f_high) + '_tau_' + str(tau) + '.hdf5'), 'w') as f:
+			Hp = np.asarray(f['Hp'])
+			Hc = np.asarray(f['Hc'])
 
+		shift = int((t_inj - (wf_times[0] + Tc/2)) * fw)
+		Hp = np.roll(Hp, shift)
+		Hc = np.roll(Hc, shift)
+		# Hp, Hc = white_noise(wf_times, t_inj, inj_params['f_low'], inj_params['f_high'], inj_params['tau'])
+	
 	hp, hc = gen_waveform(inj_params['A'], alpha, Hp, Hc)
 	hp = TimeSeries(hp, t0=wf_times[0], dt=dt)
 	hc = TimeSeries(hc, t0=wf_times[0], dt=dt)
@@ -195,7 +204,7 @@ def load_inject_condition(t_i, t_f, t_inj, ra, dec, pol, alpha, inj_type, inj_pa
 
 	wf_times = data.times.value
 
-	hp, hc = gen_inject(wf_times, data.dt, t_inj, alpha, inj_type, inj_params)
+	hp, hc = gen_inject(wf_times, data.dt, t_inj, alpha, inj_type, inj_params, Tc, fw)
 	h = fp * hp + fc * hc
 	injected_data = data.inject(h)
 

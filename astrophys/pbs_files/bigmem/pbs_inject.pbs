@@ -7,5 +7,6 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64/
 cat /etc/hostname |cut -f1 -d'.' > $HOME/python_current_host
 source $HOME/default_conda/bin/activate gw_new
 # python ../../injections/inject_times.py
-python ../../injections/inject_stats.py
+# python ../../injections/inject_stats.py
 # python ../../injections/inject_ccsn.py
+python ../../injections/inject_ccsn_stats.py

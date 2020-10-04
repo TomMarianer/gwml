@@ -35,10 +35,10 @@ save = True
 # inj_type = 'sg'
 # inj_type = 'rd'
 # inj_type = 'ga'
-inj_type = 'cg'
+# inj_type = 'cg'
 # inj_type = 'cg_inc'
 # inj_type = 'cg_double'
-# inj_type = 'wn'
+inj_type = 'wn'
 
 segment_list = get_segment_list('BOTH')
 detector = 'L'
@@ -101,11 +101,11 @@ num_cnt = 0
 # 	# for tau, A in zip(params['tau'][num_s:num_e], params['A'][num_s:num_e]):
 # 		inj_params = {'tau': tau, 'A': A}
 # 
-if inj_type == 'cg':
-	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
-	for f_inj, Q, A in zip(params['f0'], params['Q'], params['A']):
-	# for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
-		inj_params = {'f0': f_inj, 'Q': Q, 'A': A}
+# if inj_type == 'cg':
+# 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
+# 	for f_inj, Q, A in zip(params['f0'], params['Q'], params['A']):
+# 	# for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
+# 		inj_params = {'f0': f_inj, 'Q': Q, 'A': A}
 # 
 # if inj_type == 'cg_inc':
 # 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
@@ -119,11 +119,11 @@ if inj_type == 'cg':
 # 	# for f_inj, Q, A in zip(params['f0'][num_s:num_e], params['Q'][num_s:num_e], params['A'][num_s:num_e]):
 # 		inj_params = {'f0': f_inj, 'Q': Q, 'A': A}
 # 
-# if inj_type == 'wn':
-# 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f_low', 'f_high', 'tau', 'A'])
-# 	for f_low, f_high, tau, A in zip(params['f_low'], params['f_high'], params['tau'], params['A']):
-# 	# for f_low, f_high, tau, A in zip(params['f_low'][num_s:num_e], params['f_high'][num_s:num_e], params['tau'][num_s:num_e], params['A'][num_s:num_e]):
-# 		inj_params = {'f_low': f_low, 'f_high': f_high, 'tau': tau, 'A': A}
+if inj_type == 'wn':
+	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f_low', 'f_high', 'tau', 'A'])
+	for f_low, f_high, tau, A in zip(params['f_low'], params['f_high'], params['tau'], params['A']):
+	# for f_low, f_high, tau, A in zip(params['f_low'][num_s:num_e], params['f_high'][num_s:num_e], params['tau'][num_s:num_e], params['A'][num_s:num_e]):
+		inj_params = {'f_low': f_low, 'f_high': f_high, 'tau': tau, 'A': A}
 # 
 		pool = mp.Pool(15)
 		results = pool.starmap(load_inject_condition, 

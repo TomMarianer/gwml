@@ -41,7 +41,7 @@ inj_type = 'cg'
 # inj_type = 'wn'
 
 segment_list = get_segment_list('BOTH')
-detector = 'H'
+detector = 'L'
 files = get_files(detector)
 
 params_path = Path(git_path + '/shared/injection_params')
@@ -62,7 +62,9 @@ start_time = time.time()
 
 # for num_s in [9, 10, 11, 17, 18, 19]: # cg_double
 # for num_s in [0, 7, 21, 41]: # cg
-for num_s in [21, 41]:
+# for num_s in [1, 42]: # cg (more)
+for num_s in [43]: # cg (more)
+# for num_s in [1]: # wn
 	num_e = num_s + 1
 	for meta_start in [0, 100, 200, 300, 400, 500, 600, 700, 800, 900]:
 	# for meta_start in [500, 600, 700, 800, 900]:
@@ -106,7 +108,7 @@ for num_s in [21, 41]:
 			# 	for tau, A in zip(params['tau'], params['A']):
 			# 	# for tau, A in zip(params['tau'][num_s:num_e], params['A'][num_s:num_e]):
 			# 		inj_params = {'tau': tau, 'A': A}
-
+			# 
 			if inj_type == 'cg':
 				params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f0', 'Q', 'A'])
 				# for f_inj, Q, A in zip(params['f0'], params['Q'], params['A']):
@@ -127,8 +129,8 @@ for num_s in [21, 41]:
 			# 
 			# if inj_type == 'wn':
 			# 	params = pd.read_csv(join(params_path, inj_type + '_params_csv.csv'), usecols=['f_low', 'f_high', 'tau', 'A'])
-			# 	for f_low, f_high, tau, A in zip(params['f_low'], params['f_high'], params['tau'], params['A']):
-			# 	# for f_low, f_high, tau, A in zip(params['f_low'][num_s:num_e], params['f_high'][num_s:num_e], params['tau'][num_s:num_e], params['A'][num_s:num_e]):
+			# 	# for f_low, f_high, tau, A in zip(params['f_low'], params['f_high'], params['tau'], params['A']):
+			# 	for f_low, f_high, tau, A in zip(params['f_low'][num_s:num_e], params['f_high'][num_s:num_e], params['tau'][num_s:num_e], params['A'][num_s:num_e]):
 			# 		inj_params = {'f_low': f_low, 'f_high': f_high, 'tau': tau, 'A': A}
 			# 
 					pool = mp.Pool(25)
@@ -179,7 +181,8 @@ for num_s in [21, 41]:
 						fname = 'injected-' + inj_type + '-A-' + str(int(round(A / 1e-23))).zfill(4) + 'e-23-f0-'  + str(f_inj).zfill(4) + '-Q-' + str(Q).zfill(4) + '-' + str(times_s).zfill(4) + '-' + str(times_e-1).zfill(4) + '.hdf5'
 
 					elif inj_type == 'wn':
-						fname = 'injected-' + inj_type + '-A-' + str(int(round(A / 1e-22))).zfill(4) + 'e-22-f_low-'  + str(f_low).zfill(4) + '-f_high-' + str(f_high).zfill(4) + '-tau-' + str(int(round(tau * 1e3))).zfill(4) + 'e-3.hdf5'
+						fname = 'injected-' + inj_type + '-A-' + str(int(round(A / 1e-22))).zfill(4) + 'e-22-f_low-'  + \
+								 str(f_low).zfill(4) + '-f_high-' + str(f_high).zfill(4) + '-tau-' + str(int(round(tau * 1e3))).zfill(4) + 'e-3-' + str(times_s).zfill(4) + '-' + str(times_e-1).zfill(4) + '.hdf5'
 
 					with h5py.File(join(data_path, fname), 'w') as f:
 						f.create_dataset('x', data=x)

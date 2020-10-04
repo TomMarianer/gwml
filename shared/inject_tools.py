@@ -144,8 +144,11 @@ def gen_inject(wf_times, dt, t_inj, alpha, inj_type, inj_params, Tc, fw):
 									inj_params['f0'] * 20, a, f2, inj_params['Q'], method='linear')
 
 	elif inj_type == 'wn':
+		f_low = inj_params['f_low']
+		f_high = inj_params['f_high']
+		tau = inj_params['tau']
 		params_path = Path(git_path + '/shared/injection_params')
-		with h5py.File(join(params_path, 'wn_f_low_' + str(f_low) + '_f_high_' + str(f_high) + '_tau_' + str(tau) + '.hdf5'), 'w') as f:
+		with h5py.File(join(params_path, 'wn_f_low_' + str(f_low) + '_f_high_' + str(f_high) + '_tau_' + str(tau) + '.hdf5'), 'r') as f:
 			Hp = np.asarray(f['Hp'])
 			Hc = np.asarray(f['Hc'])
 

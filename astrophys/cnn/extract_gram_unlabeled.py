@@ -58,9 +58,9 @@ functor = K.function([inp, K.learning_phase()], outputs)   						   # evaluation
 labels = np.unique(y_train)
 p_list = np.arange(1,2)
 
-detector = 'H'
+detector = 'L'
 
-cond_data_path = Path('/storage/fast/users/tommaria/data/conditioned_data/16KHZ/' + detector +'1/injected/no_constraints/cg')
+cond_data_path = Path('/storage/fast/users/tommaria/data/conditioned_data/16KHZ/' + detector +'1/injected/no_constraints/')
 files = [f for f in sorted(listdir(cond_data_path)) if isfile(join(cond_data_path, f))]
 	
 for file in files:
@@ -88,7 +88,7 @@ for file in files:
 	print(y_hat.shape)
 	print(total_dev.shape)
 
-	data_path = Path('/storage/home/tommaria/thesis/new_gravityspy/features/' + detector + '1/injected/no_constraints/cg')
+	data_path = Path('/storage/home/tommaria/thesis/new_gravityspy/features/' + detector + '1/injected/no_constraints/')
 	
 	if not exists(data_path):
 		makedirs(data_path)

@@ -1,0 +1,10 @@
+,H_Air_Compressor,L_Air_Compressor,H_Blip,L_Blip,H_Chirp,L_Chirp,H_Extremely_Loud,L_Extremely_Loud,H_Koi_Fish,L_Koi_Fish,H_No_Glitch,L_No_Glitch,H_None_of_the_Above,L_None_of_the_Above,H_Power_Line,L_Power_Line,H_Repeating_Blips,L_Repeating_Blips,H_Scratchy,L_Scratchy,H_Tomte,L_Tomte,H_Wandering_Line,L_Wandering_Line,H_Whistle,L_Whistle
+0.01,0,0,0,0,0,0,25,22,0,0,0,0,65,68,0,0,0,0,0,0,0,0,0,0,0,0
+0.1,5,3,5,7,11,9,0,0,4,3,4,5,51,48,0,0,3,3,2,1,0,1,0,3,5,7
+0.2,7,5,13,11,9,10,0,0,0,0,23,24,28,26,2,2,2,0,3,3,1,0,0,1,2,8
+0.5,1,2,3,3,9,9,0,0,0,0,60,59,8,6,0,2,0,0,1,2,2,0,0,0,6,7
+1.0,2,0,3,1,6,5,0,0,0,0,73,80,1,0,2,3,0,0,1,1,1,0,0,0,1,0
+3.0,0,0,0,0,0,0,0,0,0,0,90,90,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+5.0,0,0,0,0,0,0,0,0,0,0,90,90,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+7.0,0,0,0,0,0,0,0,0,0,0,90,90,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+10.0,0,0,0,0,0,0,0,0,0,0,90,90,0,0,0,0,0,0,0,0,0,0,0,0,0,0

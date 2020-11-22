@@ -64,9 +64,9 @@ for i, t_inj in enumerate(inj_df['H'][:15]): # only use H injection times, calcu
 inj_type = 'ccsn'
 inj_params = None
 
-# ccsn_paper = 'abdikamalov'
+ccsn_paper = 'abdikamalov'
 # ccsn_paper = 'andersen'
-ccsn_paper = 'radice'
+# ccsn_paper = 'radice'
 wfs_path = Path(git_path + '/shared/ccsn_wfs/' + ccsn_paper)
 ccsn_files = [f for f in sorted(listdir(wfs_path)) if isfile(join(wfs_path, f))]
 

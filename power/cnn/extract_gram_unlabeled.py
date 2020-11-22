@@ -56,30 +56,10 @@ functor = K.function([inp, K.learning_phase()], outputs)   						   # evaluation
 labels = np.unique(y_train)
 p_list = np.arange(1,2)
 
-detector = 'L'
-if detector == 'BOTH':
-	cond_data_path = Path('/scratch300/tommaria/data/conditioned_data/16KHZ/H1/')
-	files = [f for f in sorted(listdir(cond_data_path)) if isfile(join(cond_data_path, f))]
-	
-	x = []
-	times = []
+detector = 'H'
 
-	with h5py.File(join(cond_data_path, file), 'r') as f:
-		x.extend(np.asarray(f['x']))
-		times.extend(np.asarray(f['times']))
-
-	cond_data_path = Path('/scratch300/tommaria/data/conditioned_data/16KHZ/L1/')
-
-	with h5py.File(join(cond_data_path, file), 'r') as f:
-		x.extend(np.asarray(f['x']))
-		times.extend(np.asarray(f['times']))
-
-	x = np.asarray(x)
-	times = np.asarray(times)
-
-else:
-	cond_data_path = Path('/scratch300/tommaria/data/conditioned_data/16KHZ/' + detector + '1/')
-	files = [f for f in sorted(listdir(cond_data_path)) if isfile(join(cond_data_path, f))]
+cond_data_path = Path('/scratch300/tommaria/data/conditioned_data/16KHZ/' + detector + '1/')
+files = [f for f in sorted(listdir(cond_data_path)) if isfile(join(cond_data_path, f))]
 	
 for file in files:
 	with h5py.File(join(cond_data_path, file), 'r') as f:

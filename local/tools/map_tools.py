@@ -202,7 +202,7 @@ def find_closest_index(t, times):
 	"""
 	
 	tdiff = times - t
-	idx = np.argmax(tdiff[tdiff < 0])
+	idx = np.argmax(tdiff[tdiff <= 0])
 	return idx
 
 def find_file(t, files):
@@ -217,7 +217,7 @@ def find_file(t, files):
 	# print(segments)
 
 	for segment, file in zip(segments, files):
-		if segment[0] < t and t < segment[1]:
+		if segment[0] <= t and t <= segment[1]:
 			return file
 	return None
 

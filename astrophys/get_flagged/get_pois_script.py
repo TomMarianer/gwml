@@ -44,18 +44,17 @@ def find_file(t, files):
 start_time = time.time()
 
 segment_list = get_segment_list('BOTH')
-detector = 'L'
+detector = 'H'
 print(detector)
 
-# method = 'ooc'
-method = 'kde'
-# method = 'kde_latent'
+# method = 'kde'
 # method = 'gram_single'
-# method = 'score_alpha_500'
 # method = 'y_hat_chirp'
 # method = 'y_hat_nota'
 
-with h5py.File('../../shared/tois.hdf5', 'r') as f:
+method = 'hardware_inj'
+
+with h5py.File(git_path + '/shared/tois.hdf5', 'r') as f:
 	tois = np.asarray(f[method])
 
 print(len(tois))
@@ -69,11 +68,20 @@ times = []
 
 for t in tois:
 	file = find_file(t, files)
-	assert(file is not None)
-	with h5py.File(join(data_path,file), 'r') as f:
+	if file is None:
+		continue
+
+	with h5py.File(join(data_path, file), 'r') as f:
 		temp_times = np.asarray(f['times'])
 
-	idx = find_closest_index(t + 0.5, temp_times)
+	if method == 'hardware_inj':
+		idx = find_closest_index(t - 0.5, temp_times)
+		if idx is None:
+			continue
+
+	else:
+		idx = find_closest_index(t + 0.5, temp_times)
+
 	with h5py.File(join(data_path,file), 'r') as f:
 		x.append(np.asarray(f['x'][idx]))
 
@@ -82,14 +90,19 @@ for t in tois:
 x = np.asarray(x)
 times = np.asarray(times)
 
-data_path = Path('/storage/fast/users/tommaria/data/conditioned_data/16KHZ/' + detector + '1/combined/moved')
-pois_file = '../pois/pois_new_gram_' + method + '.hdf5'
+# data_path = Path('/storage/fast/users/tommaria/data/conditioned_data/16KHZ/' + detector + '1/combined/moved')
+data_path = Path('/arch/tommaria/data/conditioned_data/16KHZ/' + detector + '1/combined/pois')
+if not exists(data_path):
+	makedirs(data_path)
+
+pois_file = 'pois_new_gram_' + method + '.hdf5'
 
 with h5py.File(join(data_path, pois_file), 'w') as f:
 	f.create_dataset('x', data=x)
 	f.create_dataset('times', data=times)
 
 print(x.shape)
+print(times[21])
 print(times.shape)
 
 print(tois - times)

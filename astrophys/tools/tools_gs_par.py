@@ -431,5 +431,14 @@ def find_closest_index(t, times):
 	"""
 	
 	tdiff = times - t
-	idx = np.argmax(tdiff[tdiff < 0])
+	try:
+		idx = np.argmax(tdiff[tdiff < 0])
+
+	except:
+		try:
+			idx = np.argmax(tdiff[tdiff <= 0])
+			
+		except:
+			return
+
 	return idx

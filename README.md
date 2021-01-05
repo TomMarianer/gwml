@@ -17,7 +17,6 @@ qsub -q QUEUE_NAME PBS_FILE.pbs
 ## Astrophys
 Astrophys was used to download bulk GW strain files from the [Gravitational Wave Open Science Center](https://www.gw-openscience.org/), and to pre-process the strain data in order to generate spectrograms.
 The astrophys subfolder tree:
-
 - bulk_data_urls - this folder contains files with lists of urls to the GW strain files on GWOSC, from both O1 and O2, and from both LIGO detectors (H1 and L1).
 - cnn - a folder containing a script used to feed a spectrogram through a CNN and extract the relevant features from it. This was used only for a small part of the project, when the power cluster was down (most of the CNN related processing was done on power).
 - condition - scripts used to 'condition' the strain data, meaning to pre-process it and generate spectrograms. This folder contains three files:
@@ -62,3 +61,29 @@ The astrophys subfolder tree:
   - params.py - parameters relevant to to conditioning phase.
   - tools_gs.py - tools used to condition the strain data and generate the spectrograms, non-parallel version - obsolete.
   - tools_gs_par.py - tools used to condition the strain data and generate the spectrograms, parallel version (this one should be used).
+
+## Local
+The local subfolder tree:
+- notebooks - jupyter notebooks used for small processing tasks and for creating visualizations. This folder contains the following files:
+  - ccsn_waveforms.ipynb - used for experimentation and familiarization with the simulated CCSNe waveforms, and to figure out how to inject them. Not really a part of the pipeline.
+  - compute_kde.ipynb - used to compute and save the kde estimator (density estimator of the map space) and the contours of the threshold density.
+  - create_examples.ipynb - create a file containing a small, random set of examples from the training set, including the spectrograms, labels, time-stamps and features extracted using the CNN.
+  - create_maps.ipynb - for a set of files containing features exctracted using the CNN, compute the map space representations (using the mapper computed in create_umap.ipynb), and append them to each file.
+  - create_umap.ipynb - compute and save the UMAP mapper, mapping the feature space to the map space, using the training set's extracted features.
+  - flag_outliers.ipynb - flag outliers according to the different methods and thresholds and save the outlier time-stamps to a file.
+  - gen_wn.ipynb - generate and save white noise waveforms that are to be injected in the evaluation phase of the pipeline.
+  - get_hardware_inj_time.ipynb - find and save hardware injection times to a file. Not really part of the pipeline, was used to visualize the map space representation of the hardware injections.
+  - injection_waveforms.ipynb - used for experimentation and familiarization with ad-hoc waveforms, and to figure out how to inject them (similar to the simulated ccsn_waveforms.ipynb). Not really a part of the pipeline.
+  - plot_flagged.ipynb - post-processing and visualization of the outliers flagged by the different methods.
+  - plot_map_space.ipynb - used to generate the map space figure used in the paper.
+  - process_injected.ipynb - post-processing of the injected ad-hoc waveforms, and gather detection statistics.
+  - process_injected_ccsn.ipynb - same as previous, but for the simulated CCSNe waveforms.
+- tools - tools used locally for post-processing and visualizations. This folder contains the following files:
+  - Three `.txt` injections files - containing hardware injection times for both LIGO detectors and for both O1 and O2.
+  - contours_kde.sav - data file containing the contours of threshold density in the map space.
+  - kde_0_3.sav - data file containing the kde estimator of the map space distribution.
+  - map_tools.py - tools used for accessing data, and some manipulations, mostly obsolete.
+  - mapper.sav - data file containing the UMAP mapper, mapping the feature space to the map space.
+  - params.py - parameters used by the local jupyter notebooks.
+  - plot_tools.py - tools used to generate the interactive plots of the map space together with spectrograms of the chosen points. These plots are generated using holoviews with a bokeh backend.
+  - plot_tools_mpl.py - tools used to generate plots that were used in the paper. These plots were generated using matplotlib (mpl allows for better/easier customization required for the paper plots).

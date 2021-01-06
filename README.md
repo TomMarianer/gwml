@@ -5,7 +5,7 @@ The code is divided into four folders - three for the three machines I used to r
 The three machines, and motivation for using each, are:
 
 - astrophys - the astrophysics department's cluster, useful because of the large storage space available and the 'bigmem' node - a node with 1000GB RAM.
-- power - the university's power cluster, useful because of the high performance GPU's installed on it (NVIDIA Tesla V100 at the time).
+- power - the university's power cluster, useful because of the high performance GPUs installed on it (NVIDIA Tesla V100 at the time).
 - local - my laptop, used to run Juptyer notebooks for post-processing and visualizations.
 
 Both astrophys and power are high performance clusters, running PBS servers. Therefore, the code run on these clusters was written as `.py` scripts. Each script (or group of scripts performing similar tasks) has a corresponding `.pbs` file, containing pbs commands to submit the script to the cluster. The submission itself is then done using the following command:
@@ -27,7 +27,7 @@ The astrophys subfolder tree:
   - download_16.py - script used to download bulk 16KHz strain files.
   - download_gs.py - script used to download files containing glithces from the Gravity Spy data set.
   - files_with_glitch.txt - list of the urls of files containing the GS data set glitches.
-- get_flagged - script used to extract the spectrograms of the time-stamps flagged as outliers by the different methods, and to save them to a single file.
+- get_flagged - contains get_pois_script.py, script used to extract the spectrograms of the time-stamps flagged as outliers by the different methods, and to save them to a single file.
 - gravityspy - this folder contains scripts used to generate spectrograms of the time-stamps from the GS data set, and to label them according to the data set. these are used as the training data set when training the CNN. This folder contains the following files:
   - combine_fromraw.py - a script used to combine the spectrogram files generated using create_gs_fromraw.py into a single file containing all the training spectrograms.
   - create_gs_fromraw.py - a script used to generate the spectrograms of the GS data set. The data set is too large to generate all of them in a single run of the script (as it is written, this can probably be improved), therefore it is divided to several runs, each generating a seperate file. These files are finally combined to a single file using combine_fromraw.py.
@@ -44,18 +44,18 @@ The astrophys subfolder tree:
   - inject_times_backup.py - backup of an obsolete version of the previous script.
 - pbs_files - folder containing the `.pbs` files used to submit the `.py` scripts to the cluster. They are divided into subfolders according to the queue the scripts should be submitted to.
   - bigmem
-    - pbs_combine.pbs - used to submit /condition/combine_segment.py
-    - pbs_combine_fromraw.pbs - used to submit /gravityspy/combine_fromraw.py
-    - pbs_combine_injected.pbs - used to submit /injections/combine_injected.py
-    - pbs_condition.pbs - used to submit /condition/condition_raw_par.py
-    - pbs_create_fromraw.pbs - used to submit /gravityspy/create_gs_fromraw.py
-    - pbs_inject.pbs - used to submit /injections/inject_*.py
-    - pbs_missing.pbs - used to submit /gravityspy/find_missing.py
-    - pbs_pois.pbs - used to submit /get_flagged/get_pois_script.py
+    - pbs_combine.pbs - used to submit /condition/combine_segment.py.
+    - pbs_combine_fromraw.pbs - used to submit /gravityspy/combine_fromraw.py.
+    - pbs_combine_injected.pbs - used to submit /injections/combine_injected.py.
+    - pbs_condition.pbs - used to submit /condition/condition_raw_par.py.
+    - pbs_create_fromraw.pbs - used to submit /gravityspy/create_gs_fromraw.py.
+    - pbs_inject.pbs - used to submit /injections/inject_*.py.
+    - pbs_missing.pbs - used to submit /gravityspy/find_missing.py.
+    - pbs_pois.pbs - used to submit /get_flagged/get_pois_script.py.
   - gpuq
-    - pbs_extract.pbs - used to submit /cnn/extract_gram_unlabeled.py
+    - pbs_extract.pbs - used to submit /cnn/extract_gram_unlabeled.py.
   - workq
-    - pbs_download.pbs - used to submit /dowbload/download_*.py
+    - pbs_download.pbs - used to submit /dowbload/download_16.py and /download/download_gs.py.
 - segment files - folder containing files with lists of the time segments from O1 and O2 - files with segments of available data for each detector (e.g., O1_H1_DATA), as well as files with segments for which data from both detectors are available (e.g., O1_BOTH_DATA).
 - tools - folder containing tools and parameter files:
   - params.py - parameters relevant to to conditioning phase.
@@ -87,3 +87,39 @@ The local subfolder tree:
   - params.py - parameters used by the local jupyter notebooks.
   - plot_tools.py - tools used to generate the interactive plots of the map space together with spectrograms of the chosen points. These plots are generated using holoviews with a bokeh backend.
   - plot_tools_mpl.py - tools used to generate plots that were used in the paper. These plots were generated using matplotlib (mpl allows for better/easier customization required for the paper plots).
+
+## Power
+Power was used to train the deep CNN used in the project, and to process the unlabeled spectrograms through it once it was trained. The reason is the high performance GPU installed on it reduced the training and processing time significantly.
+The power subfolder tree:
+- cnn - the scripts for training the network and processing the spectrograms with it. This folder contains the following files:
+  - extract_gram.py - script to feed the labeled spectrograms through the trained network, and to extract the feature space representations (the penultimate layer activations) and the label predictions. In addition, this script computes the relevant values for the Gram matrix method: The minimum and maximum Gram matrix values for the training set, and the deviations for the test and validation set.
+  - extract_gram_unlabeled.py - similar to the previous script, only this time for unlabeled spectrograms (from a detector defined in the script).
+  - model_evaluation.py - script to evaluate the trained networks, prints losses and classification accuracies for the test, validation and training set.
+  - train_network.py - script to define, train and save the network.
+- pbs_files - folder containing the `.pbs` files used to submit the `.py` scripts to the cluster. They are divided into subfolders according to the queue the scripts should be submitted to (similar to the pbs_files folder on astrophys).
+  - gpu
+    - pbs_extract.pbs - used to submit /cnn/extract_gram.py and /cnn/extract_gram_unlabeled.py.
+    - pbs_model_eval.pbs - used to submit /cnn/model_evaluation.py.
+    - pbs_train_network.pbs - used to submit /cnn/train_network.py.
+  - workq
+    - pbs_split_augment.pbs - used to submit /split_augment/split_augment.py.
+- split_augment - contains split_augment.py, script used to split the labeled data set into training test and validation sets, and to augment the training set.
+- tools - tools and parameters used by the scripts on power cluster. 
+  - gsparams.py - parameters file, containing parameters relating to the CNN.
+  - gstools.py - tools relating to training the CNN and to extracting the relevant features from it.
+
+## Shared
+The shared folder contains files used in multiple locations. In practice, they are used only in astrophys and locally.
+The shared subfolder tree:
+- ccsn_wfs - folder containing simulated CCSNe waveforms, used to evaluate the search by injecting them into the strain data.
+- injection_params - folder containing several files that relate to the injection process:
+  - Files ending with 'params_csv.csv' - detail the injection parameters of the different waveforms to be injected.
+  - Files containing 'ood' or 'pred' - describe injected waveforms' detection rates.
+  - sky_loc_csv.csv - file containing randomly generated source parameters for the injected waveforms - sky location (ra, dec), polarization angle (pol) and total polarization (alpha).
+  - soft_inj_time.csv - file containing injection times, generated randomly with the constraint that these times contain no glitch. This file contains times for both H and L detectors, however in practice, only the H generated times were used, and the L times were computed according to the sky location.
+  - soft_inj_time_no_contstraint.csv - file containing randomly generated injection times, this time with no constraint. As with the previous files, only the H times were used, and the L times were computed according to the sky location.
+  - Two `.hdf5` files - containing white noise waveforms (with two sets of parameters) to be injected.
+- Three `.csv` files - containing lists of the outliers detected by each method, the detector in which each outlier occured and their types.
+- inject_tools.py - tools used for injecting the simulated waveforms.
+- inject_tools_backup.py - backup of the previous file - obsolete version.
+- tois.hdf5 - file containing the 'times of interest' - the outlier time-stamps for each method.

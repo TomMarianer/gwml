@@ -15,8 +15,27 @@ qsub -q QUEUE_NAME PBS_FILE.pbs
 
 # Project pipeline
 ## Training
-1. Download files from GWOSC (optional, required only for files that haven't been downloaded) - download GW strain files containing glithces labeled by Gravity Spy, by submitting the `download_gs.py` script using `pbs_download.pbs` (on astrophys).
-2. 
+### On astrophys:
+<!---
+1. Download files from GWOSC (optional, required only for files that haven't been downloaded) - download GW strain files containing glithces labeled by Gravity Spy, by submitting the `download_gs.py` script using `pbs_download.pbs`.
+2. Generate training set - generate spectrograms of the time-stamps in Gravity Spy and label them accordingly, by submitting the `create_gs_fromraw.py` script using `pbs_create_fromraw.pbs`.
+--->
+
+| Action | Description | Script to submit | PBS file | Notes |
+| ------ | ----------- | ---------------- | -------- | ----- |
+| Download files from GWOSC | download GW strain files containing glithces labeled by Gravity Spy | `download_gs.py` | `pbs_download.pbs` | in the PBS file uncomment/comment out the relevant lines. |
+| Generate training set | generate spectrograms of the time-stamps in Gravity Spy and label them accordingly | `create_gs_fromraw.py` | `pbs_create_fromraw.pbs` | in order to avoid issues on the cluster, the script conditions only 1000 time-stamps at a time, so the script should be run several times, with a different value for the  `idx_start` variable, starting from 0 and changing in steps of 1000 (the number of time-stamps conditioned each time can be increased somewhat, to around 2500 but not much more as the script is written currently). |
+| Combine training set | combine the files generated in the previous step to a single `.hdf5` containing the entire training set | `combine_fromraw.py` | `pbs_combine_fromraw.pbs` | |
+| Transfer to power | transfer the `.hdf5` file containing the training set to power cluster | | | can be done using the `scp` command:<br>`scp FILE PATH_ON_POWER` |
+
+### On power:
+| Action | Description | Script to submit | PBS file | Notes |
+| ------ | ----------- | ---------------- | -------- | ----- |
+| Split and augment | split the data set into training, test and validation sets, and augment the training set | `split_augment.py` | `pbs_split_augment.pbs` | |
+| Train model | train a deep CNN using the generated spectrograms | `train_network.py` | `pbs_train_network.pbs` | several training hyper-parameters can be chosen in the parameters file `gsparams.py` such as the pre-trained model to use (`extract_model` variabel), the input size, the optimization method and the name given to thel model. |
+| Evaluate model | evaluate the trained model and print the loss and classification accuracy for the training, test and validation sets | `model_evaluation.py` | `pbs_model_eval.pbs` | prints the results to `stdout`. |
+| Extract labeled set features | feed the labeled data set through the network and extract feature space representations, softmax predictions and values relevant to the Gram matrix method | `extract_gram.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. |
+
 
 # Code
 ## Astrophys

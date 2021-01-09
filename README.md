@@ -36,6 +36,15 @@ qsub -q QUEUE_NAME PBS_FILE.pbs
 | Evaluate model | evaluate the trained model and print the loss and classification accuracy for the training, test and validation sets | `model_evaluation.py` | `pbs_model_eval.pbs` | prints the results to `stdout`. |
 | Extract labeled set features | feed the labeled data set through the network and extract feature space representations, softmax predictions and values relevant to the Gram matrix method | `extract_gram.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. |
 
+## Training
+### On astrophys:
+| Action | Description | Script to submit | PBS file | Notes |
+| ------ | ----------- | ---------------- | -------- | ----- |
+| Download files from GWOSC | download bulk GW strain files | `download_16.py` | `pbs_download.pbs` | in the PBS file uncomment/comment out the relevant lines. in the script choose the desired detector (currently either 'H1' or 'L1') and the desired file indices. |
+| Condition data | condition the raw strain data and generate spectrograms. | `condition_raw_par.py` | `pbs_condition.pbs` | in the script, choose the detector to be conditioned (either 'H' or 'L') and the segment numbers to be conditioned (when I ran this script I ran it on groups of 50 segments at a time). This script generates a folder for each segment, and within it a seperate `.hdf5` file for each chunk conditioned. |
+| Combine spectrograms | combine the spectrograms generated in each segment to a single `.hdf5` file | `combine_segment.py` | `pbs_combine.pbs` | as in the previous step, choose the desired detector and segments to be combined. |
+| Transfer to power | transfer the `.hdf5` files containing the spectrograms to be processed with the network to power cluster | | | can be done using the `scp` command:<br>`scp FILE PATH_ON_POWER` |
+
 
 # Code
 ## Astrophys

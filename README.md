@@ -16,11 +16,6 @@ qsub -q QUEUE_NAME PBS_FILE.pbs
 # Project pipeline
 ## Training
 ### On astrophys:
-<!---
-1. Download files from GWOSC (optional, required only for files that haven't been downloaded) - download GW strain files containing glithces labeled by Gravity Spy, by submitting the `download_gs.py` script using `pbs_download.pbs`.
-2. Generate training set - generate spectrograms of the time-stamps in Gravity Spy and label them accordingly, by submitting the `create_gs_fromraw.py` script using `pbs_create_fromraw.pbs`.
---->
-
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
 | Download files from GWOSC | download GW strain files containing glithces labeled by Gravity Spy | `download_gs.py` | `pbs_download.pbs` | in the PBS file uncomment/comment out the relevant lines. |
@@ -48,7 +43,7 @@ qsub -q QUEUE_NAME PBS_FILE.pbs
 ### On power:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
-| Extract features | process the unlabeled spectrograms through the network and extract the feature space representations, softmax predictions and Gram method deviations. | `extract_gram_unlabeled.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. in the script choose the desired detector. |
+| Extract features | process the unlabeled spectrograms through the network and extract the feature space representations, softmax predictions and Gram method deviations. | `extract_gram_unlabeled.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. In the script choose the desired detector. |
 | Transfer to local | transfer the `.hdf5` files containing the extracted features for both training set as well as the unlabeled spectrograms to be searched to the machine that will run the jupyter notebooks in the 'local' subfolder. | | | can be done the `scp` command |
 
 ### On local:
@@ -79,6 +74,33 @@ qsub -q QUEUE_NAME PBS_FILE.pbs
 | Generate injection parameters | generate `.csv` files containig the random injection times (with and without the no glitch constraint) and the random sky locations (and polarization parameters). | `inject_times_gen.ipynb` | I forgot to add this notebook to the git at first, so it's not documented very well and might not work currently (but the `.csv` were already generated and are in the 'shared' subfolder). |
 | Generate white noise waveform | generate the random white noise waveform to be injected. | `gen_wn.ipynb` |  |
 | Transfer to astrophys | transfer the `.csv` files containing injection times and sky locations to astrophys. | | the files are saved to the github folder (to the 'shared' subfolder), so this can be done simply by using the `git pull` command on astrophys. |
+
+### On astrophys:
+| Action | Description | Script to submit | PBS file | Notes |
+| ------ | ----------- | ---------------- | -------- | ----- |
+| Inject ad-hoc waveforms | inject ad-hoc waveforms, to a small number of time-stamps with the no glitch constraint. | `inject_times.py` | `pbs_inject.pbs` | in the PBS file uncomment/comment out the relevant lines. This script should be run once for each detector and for each waveform type (chosen by the `detector` and `inj_type` variables). The script is not written very well, so in addition to the variables, the loop related to the desired injection type should be uncommented, and the rest commented out. |
+| Inject CCSNe waveforms | inject CCSNe waveforms, to a small number of time-stamps with the no glitch constraint. | `inject_ccsn.py` | `pbs_inject.pbs` | in the PBS file uncomment/comment out the relevant lines. This script should be run once for each detector and for each CCSNe paper (chosen by the `detector` and `ccsn_paper` variables). |
+| Transfer to power | transfer the `.hdf5` files containing the injected spectrograms to be processed with the network to power cluster | | | can be done using the `scp` command:<br>`scp FILE PATH_ON_POWER`. |
+
+### On power:
+| Action | Description | Script to submit | PBS file | Notes |
+| ------ | ----------- | ---------------- | -------- | ----- |
+| Extract features | process the injected spectrograms through the network and extract the feature space representations, softmax predictions and Gram method deviations. | `extract_gram_unlabeled.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. In the script choose the desired detector. |
+| Transfer to local | transfer the `.hdf5` files containing the extracted features machine that runs the jupyter notebooks in the 'local' subfolder. | | | can be done the `scp` command |
+
+### On local:
+| Action | Description | Notebook to run | Notes |
+| ------ | ----------- | --------------- | ----- |
+| Map spectrograms | map injected spectrograms to the map space, and append them to the features files. | `create_maps.ipynb` | choose the path to the folder containing the desired features files. |
+| Process injected | post-process the injected spectrograms (both the ad-hoc and CCSNe waveforms), and get detection statistics using the different outlier detection methods. | `process_injected.ipynb` and `process_injected_ccsn.ipynb` | these notebook is not organized and documented well, theyt probably should be written from scratch. |
+
+### On astrophys:
+| Action | Description | Script to submit | PBS file | Notes |
+| ------ | ----------- | ---------------- | -------- | ----- |
+| Gather statistics | for the chosen waveforms, inject into additional time-stamps (without the no glitch constraint) for additional detection statistics. The waveforms chosen are the waveforms for which at least half of the injections were detected in both detectors by at least one method. | `inject_stats.py` and `inject_ccsn_stats.py` | `pbs_inject.pbs` | the same notes as for the previous injection scripts apply. In addition, since these scripts generate 1000 injections, they are divided into groups of 100 injections (which generate separate files for each group). |
+| Combine injections | combine the injections generated by the previous scripts into a single file for each injection waveform. | `combine_injected.py` | `pbs_combine_injected.pbs` | should be performed for each injected waveform separately. |
+
+The final steps as for the previous injections should be repeated for the new injections (extract features using the network on power, map the features to the map space and post-process the injections using the relevant notebooks on local).
 
 # Code
 ## Astrophys

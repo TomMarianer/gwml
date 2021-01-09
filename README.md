@@ -36,7 +36,7 @@ qsub -q QUEUE_NAME PBS_FILE.pbs
 | Evaluate model | evaluate the trained model and print the loss and classification accuracy for the training, test and validation sets | `model_evaluation.py` | `pbs_model_eval.pbs` | prints the results to `stdout`. |
 | Extract labeled set features | feed the labeled data set through the network and extract feature space representations, softmax predictions and values relevant to the Gram matrix method | `extract_gram.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. |
 
-## Training
+## Search
 ### On astrophys:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
@@ -51,6 +51,34 @@ qsub -q QUEUE_NAME PBS_FILE.pbs
 | Extract features | process the unlabeled spectrograms through the network and extract the feature space representations, softmax predictions and Gram method deviations. | `extract_gram_unlabeled.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. in the script choose the desired detector. |
 | Transfer to local | transfer the `.hdf5` files containing the extracted features for both training set as well as the unlabeled spectrograms to be searched to the machine that will run the jupyter notebooks in the 'local' subfolder. | | | can be done the `scp` command |
 
+### On local:
+| Action | Description | Notebook to run | Notes |
+| ------ | ----------- | --------------- | ----- |
+| Generate UMAP | generate the UMAP mapping between the feature space and the map space, and save it to a file. The mapping is generated using the training set features. | `compute_umap.ipynb` | the notebook also enables to generate an interactive plot of th map space and explore it. |
+| Generate examples | generate file containing examples of the different glitch classes in the GS data set. | `create_examples.ipynb` | optional, these examples can be used in some of the visualizations of the map space. |
+| Estimate distribution | estimate the map space distribution using kernel density estimation on the training set, and save the estimator. | `compute_kde.ipynb` | this notebook enables to generate contours of density equal to the threshold. The threshold can be determined later using the unlabeled data, so the this notebook can be used again after the threshold is chosen to generate the contours. |
+| Map spectrograms | map unlabeled spectrograms to the map space, and append them to the features files. | `create_maps.ipynb` | choose the path to the folder containing the desired features files (the same notebook is later used to map the injected files, and the path currently defined is the path to the injection files). |
+| Flag outliers | flag time-stamps containing outliers according to the different methods, and save them to `tois.hdf5`. | `flag_outliers.ipynb` | this notebook can be used to determine the thresholds of the density, and Gram, methods - the thresholds are chosen to achieve a desired number of identified outliers. |
+| Plot map space | generate a plot of the map space using matplotlib | `plot_map_space.ipynb` | optional, this notebook was used to generate the plot in the paper. | Transfer `tois.hdf5` to astrophys | transfer the outlier time-stamps file to astrophys. | | the file is saved to the github folder (to the 'shared' subfolder), so this can be done simply by using the `git pull` command on astrophys. |
+
+### On astrophys:
+| Action | Description | Script to submit | PBS file | Notes |
+| ------ | ----------- | ---------------- | -------- | ----- |
+| Get flagged | generate a file containing the spectrograms of the outlier time-stamps for each outlier detection method. | `get_pois_script.py` | `pbs_pois.pbs` | the script should be run several times, once for each outlier detection method, and for each detector (chosen by the `method` and `detector` variables in the script). |
+| Transfer to local | transfer the files containing the outlier spectrograms to the machine running the jupyter notebooks. | | | |
+
+### On local:
+| Action | Description | Notebook to run | Notes |
+| ------ | ----------- | --------------- | ----- |
+| Visualize outliers | generate plots of the outlier spectrograms, in order to identify the types of outliers. | `plot_flagged.ipynb` | this notebook is not organized and documented well, it probably should be written from scratch. |
+
+## Evaluation
+### On local:
+| Action | Description | Notebook to run | Notes |
+| ------ | ----------- | --------------- | ----- |
+| Generate injection parameters | generate `.csv` files containig the random injection times (with and without the no glitch constraint) and the random sky locations (and polarization parameters). | `inject_times_gen.ipynb` | I forgot to add this notebook to the git at first, so it's not documented very well and might not work currently (but the `.csv` were already generated and are in the 'shared' subfolder). |
+| Generate white noise waveform | generate the random white noise waveform to be injected. | `gen_wn.ipynb` |  |
+| Transfer to astrophys | transfer the `.csv` files containing injection times and sky locations to astrophys. | | the files are saved to the github folder (to the 'shared' subfolder), so this can be done simply by using the `git pull` command on astrophys. |
 
 # Code
 ## Astrophys

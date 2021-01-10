@@ -218,13 +218,7 @@ The `shared/` subfolder tree:
 A description of the data generated/used in this project, and their whereabouts.
 ## On astrophys
 The data on the astrophys cluster is sotred on the `/arch/` drive - a large (175TB) storage drive.
-The path to the data folder is: `/arch/tommaria/data/`, the following is a description this folder's subfolder tree.
-<!---
-| Path | Description | Notes |
-| ---- | ----------- | ----- |
-| /arch/tommaria/data/bulk_data/16KHZ/ | Bulk GW strain files downloaded from GWOSC (sampled at 16KHz) | This folder is divided to two subfolders, one for each detector (H1/ and L1/). |
-| /arch/tommaria/data/conditioned_data/16KHZ/
---->
+The path to the data folder is: `/arch/tommaria/data/`, the data folder's subfolder tree:
 - `bulk_data/16KHZ/` - bulk GW strain files downloaded from GWOSC (sampled at 16KHz). This folder is divided to two subfolders, one for each detector (H1/ and L1/).
 - `conditioned_data/16KHZ` - files containing spectrograms generated from the raw data. This folder is divided to two subfolders, one for each detector (H1/ and L1/), and within each, to additional subfolders:
   - `combined/` - a folder containing the spectrograms generated during the search phase, divided into the following:
@@ -232,3 +226,6 @@ The path to the data folder is: `/arch/tommaria/data/`, the following is a descr
     - `pois/` - files containing spectrograms that were flagged as outliers by the different methods.
     - `tomove/` - generated spectrograms that were not processed in this project (they were generated after the spectrograms in `moved/` were processed, with the purpose of processing them as well, but I never got to it).
   - `injected/` - a folder containing the spectrograms of the injected waveforms, generated during the evaluation phase of the project.
+- `multi_scale/conditioned_data/16KHZ` - a folder containing multi-scale spectrograms, generated during a small followup of this project, a multi-scale version of the pipeline.
+
+The `/arch/` drive is a slower, archive drive. It is used to store the bulk/generated data because of it's large volume, but when I ran the project, the files were saved to the faster `/storage/fast/` drive, in the path `/storage/fast/users/tommaria/data/` (which contains a subfolder tree very similar to the one in `/arch/tommaria/data/`).

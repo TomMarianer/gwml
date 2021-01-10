@@ -106,7 +106,7 @@ The final steps as for the previous injections should be repeated for the new in
 A description of the project's subfolder tree.
 ## Astrophys
 Astrophys was used to download bulk GW strain files from the [Gravitational Wave Open Science Center](https://www.gw-openscience.org/), and to pre-process the strain data in order to generate spectrograms.
-The astrophys subfolder tree:
+The `astrophys/` subfolder tree:
 - `bulk_data_urls/` - this folder contains files with lists of urls to the GW strain files on GWOSC, from both O1 and O2, and from both LIGO detectors (H1 and L1).
 - `cnn/` - a folder containing a script used to feed a spectrogram through a CNN and extract the relevant features from it. This was used only for a small part of the project, when the power cluster was down (most of the CNN related processing was done on power).
 - `condition/` - scripts used to 'condition' the strain data, meaning to pre-process it and generate spectrograms. This folder contains three files:
@@ -153,8 +153,8 @@ The astrophys subfolder tree:
   - `tools_gs_par.py` - tools used to condition the strain data and generate the spectrograms, parallel version (this one should be used).
 
 ## Local
-The local subfolder tree:
-- notebooks - jupyter notebooks used for small processing tasks and for creating visualizations. This folder contains the following files:
+The `local/` subfolder tree:
+- `notebooks/` - jupyter notebooks used for small processing tasks and for creating visualizations. This folder contains the following files:
   - `ccsn_waveforms.ipynb` - used for experimentation and familiarization with the simulated CCSNe waveforms, and to figure out how to inject them. Not really a part of the pipeline.
   - `compute_kde.ipynb` - used to compute and save the kde estimator (density estimator of the map space) and the contours of the threshold density.
   - `create_examples.ipynb` - create a file containing a small, random set of examples from the training set, including the spectrograms, labels, time-stamps and features extracted using the CNN.
@@ -168,7 +168,7 @@ The local subfolder tree:
   - `plot_map_space.ipynb` - used to generate the map space figure used in the paper.
   - `process_injected.ipynb` - post-processing of the injected ad-hoc waveforms, and gather detection statistics.
   - `process_injected_ccsn.ipynb` - same as previous, but for the simulated CCSNe waveforms.
-- tools - tools used locally for post-processing and visualizations. This folder contains the following files:
+- `tools/` - tools used locally for post-processing and visualizations. This folder contains the following files:
   - Three `.txt` injections files - containing hardware injection times for both LIGO detectors and for both O1 and O2.
   - `contours_kde.sav` - data file containing the contours of threshold density in the map space.
   - `kde_0_3.sav` - data file containing the kde estimator of the map space distribution.
@@ -180,29 +180,29 @@ The local subfolder tree:
 
 ## Power
 Power was used to train the deep CNN used in the project, and to process the unlabeled spectrograms through it once it was trained. The reason is the high performance GPU installed on it reduced the training and processing time significantly.
-The power subfolder tree:
-- cnn - the scripts for training the network and processing the spectrograms with it. This folder contains the following files:
+The `power/` subfolder tree:
+- `cnn/` - the scripts for training the network and processing the spectrograms with it. This folder contains the following files:
   - `extract_gram.py` - script to feed the labeled spectrograms through the trained network, and to extract the feature space representations (the penultimate layer activations) and the label predictions. In addition, this script computes the relevant values for the Gram matrix method: The minimum and maximum Gram matrix values for the training set, and the deviations for the test and validation set.
   - `extract_gram_unlabeled.py` - similar to the previous script, only this time for unlabeled spectrograms (from a detector defined in the script).
   - `model_evaluation.py` - script to evaluate the trained networks, prints losses and classification accuracies for the test, validation and training set.
   - `train_network.py` - script to define, train and save the network.
-- pbs_files - folder containing the `.pbs` files used to submit the `.py` scripts to the cluster. They are divided into subfolders according to the queue the scripts should be submitted to (similar to the pbs_files folder on astrophys).
-  - gpu
+- `pbs_files/` - folder containing the `.pbs` files used to submit the `.py` scripts to the cluster. They are divided into subfolders according to the queue the scripts should be submitted to (similar to the pbs_files folder on astrophys).
+  - `gpu/`
     - `pbs_extract.pbs` - used to submit `/cnn/extract_gram.py` and `/cnn/extract_gram_unlabeled.py`.
     - `pbs_model_eval.pbs` - used to submit `/cnn/model_evaluation.py`.
     - `pbs_train_network.pbs` - used to submit `/cnn/train_network.py`.
-  - workq
+  - `workq/`
     - `pbs_split_augment.pbs` - used to submit `/split_augment/split_augment.py`.
-- split_augment - contains `split_augment.py`, script used to split the labeled data set into training test and validation sets, and to augment the training set.
-- tools - tools and parameters used by the scripts on power cluster. 
+- `split_augment/` - contains `split_augment.py`, script used to split the labeled data set into training test and validation sets, and to augment the training set.
+- `tools/` - tools and parameters used by the scripts on power cluster. 
   - `gsparams.py` - parameters file, containing parameters relating to the CNN.
   - `gstools.py` - tools relating to training the CNN and to extracting the relevant features from it.
 
 ## Shared
-The shared folder contains files used in multiple locations. In practice, they are used only in astrophys and locally.
-The shared subfolder tree:
-- ccsn_wfs - folder containing simulated CCSNe waveforms, used to evaluate the search by injecting them into the strain data.
-- injection_params - folder containing several files that relate to the injection process:
+The `shared/` folder contains files used in multiple locations. In practice, they are used only in astrophys and locally.
+The `shared/` subfolder tree:
+- `ccsn_wfs/` - folder containing simulated CCSNe waveforms, used to evaluate the search by injecting them into the strain data.
+- `injection_params/` - folder containing several files that relate to the injection process:
   - Files ending with `params_csv.csv` - detail the injection parameters of the different waveforms to be injected.
   - Files containing `ood` or `pred` - describe injected waveforms' detection rates.
   - `sky_loc_csv.csv` - file containing randomly generated source parameters for the injected waveforms - sky location (ra, dec), polarization angle (pol) and total polarization (alpha).
@@ -217,18 +217,18 @@ The shared subfolder tree:
 # Data
 A description of the data generated/used in this project, and their whereabouts.
 ## On astrophys
-The data on astrophys is sotred on the /arch/ drive - a large (175TB) storage drive.
-The path to the data folder is: /arch/tommaria/data/, the following is a description this folder's subfolder tree.
+The data on the astrophys cluster is sotred on the `/arch/` drive - a large (175TB) storage drive.
+The path to the data folder is: `/arch/tommaria/data/`, the following is a description this folder's subfolder tree.
 <!---
 | Path | Description | Notes |
 | ---- | ----------- | ----- |
 | /arch/tommaria/data/bulk_data/16KHZ/ | Bulk GW strain files downloaded from GWOSC (sampled at 16KHz) | This folder is divided to two subfolders, one for each detector (H1/ and L1/). |
 | /arch/tommaria/data/conditioned_data/16KHZ/
 --->
-- bulk_data/16KHZ/ - bulk GW strain files downloaded from GWOSC (sampled at 16KHz). This folder is divided to two subfolders, one for each detector (H1/ and L1/).
-- conditioned_data/16KHZ - files containing spectrograms generated from the raw data. This folder is divided to two subfolders, one for each detector (H1/ and L1/), and within each, to additional subfolders:
-  - combined/ - a folder containing the spectrograms generated during the search phase, divided into the following:
-    - moved/ - spectrograms that were already processed through the network during this project ('moved' to power cluster).
-    - pois/ - files containing spectrograms that were flagged as outliers by the different methods.
-    - tomove/ - generated spectrograms that were not processed in this project (they were generated after the spectrograms in 'moved/' were processed, with the purpose of processing them as well, but I never got to it).
-  - injected/ - a folder containing the spectrograms of the injected waveforms, generated during the evaluation phase of the project.
+- `bulk_data/16KHZ/` - bulk GW strain files downloaded from GWOSC (sampled at 16KHz). This folder is divided to two subfolders, one for each detector (H1/ and L1/).
+- `conditioned_data/16KHZ` - files containing spectrograms generated from the raw data. This folder is divided to two subfolders, one for each detector (H1/ and L1/), and within each, to additional subfolders:
+  - `combined/` - a folder containing the spectrograms generated during the search phase, divided into the following:
+    - `moved/` - spectrograms that were already processed through the network during this project ('moved' to power cluster).
+    - `pois/` - files containing spectrograms that were flagged as outliers by the different methods.
+    - `tomove/` - generated spectrograms that were not processed in this project (they were generated after the spectrograms in `moved/` were processed, with the purpose of processing them as well, but I never got to it).
+  - `injected/` - a folder containing the spectrograms of the injected waveforms, generated during the evaluation phase of the project.

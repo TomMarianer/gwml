@@ -102,7 +102,8 @@ qsub -q QUEUE_NAME PBS_FILE.pbs
 
 The final steps as for the previous injections should be repeated for the new injections (extract features using the network on power, map the features to the map space and post-process the injections using the relevant notebooks on local).
 
-# Code
+# Project subfolder tree
+A description of the project's subfolder tree.
 ## Astrophys
 Astrophys was used to download bulk GW strain files from the [Gravitational Wave Open Science Center](https://www.gw-openscience.org/), and to pre-process the strain data in order to generate spectrograms.
 The astrophys subfolder tree:
@@ -212,3 +213,22 @@ The shared subfolder tree:
 - `inject_tools.py` - tools used for injecting the simulated waveforms.
 - `inject_tools_backup.py` - backup of the previous file - obsolete version.
 - `tois.hdf5` - file containing the 'times of interest' - the outlier time-stamps for each method.
+
+# Data
+A description of the data generated/used in this project, and their whereabouts.
+## On astrophys
+The data on astrophys is sotred on the /arch/ drive - a large (175TB) storage drive.
+The path to the data folder is: /arch/tommaria/data/, the following is a description this folder's subfolder tree.
+<!---
+| Path | Description | Notes |
+| ---- | ----------- | ----- |
+| /arch/tommaria/data/bulk_data/16KHZ/ | Bulk GW strain files downloaded from GWOSC (sampled at 16KHz) | This folder is divided to two subfolders, one for each detector (H1/ and L1/). |
+| /arch/tommaria/data/conditioned_data/16KHZ/
+--->
+- bulk_data/16KHZ/ - bulk GW strain files downloaded from GWOSC (sampled at 16KHz). This folder is divided to two subfolders, one for each detector (H1/ and L1/).
+- conditioned_data/16KHZ - files containing spectrograms generated from the raw data. This folder is divided to two subfolders, one for each detector (H1/ and L1/), and within each, to additional subfolders:
+  - combined/ - a folder containing the spectrograms generated during the search phase, divided into the following:
+    - moved/ - spectrograms that were already processed through the network during this project ('moved' to power cluster).
+    - pois/ - files containing spectrograms that were flagged as outliers by the different methods.
+    - tomove/ - generated spectrograms that were not processed in this project (they were generated after the spectrograms in 'moved/' were processed, with the purpose of processing them as well, but I never got to it).
+  - injected/ - a folder containing the spectrograms of the injected waveforms, generated during the evaluation phase of the project.

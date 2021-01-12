@@ -217,7 +217,7 @@ The `shared/` subfolder tree:
 # Data
 A description of the data generated/used in this project, and their whereabouts.
 ## On astrophys
-The data on the astrophys cluster is sotred on the `/arch/` drive - a large (175TB) storage drive.
+The data on the astrophys cluster is stored on the `/arch/` drive - a large (175TB) storage drive.
 The path to the data folder is: `/arch/tommaria/data/`, the data folder's subfolder tree:
 - `bulk_data/16KHZ/` - bulk GW strain files downloaded from GWOSC (sampled at 16KHz). This folder is divided to two subfolders, one for each detector (H1/ and L1/).
 - `conditioned_data/16KHZ` - files containing spectrograms generated from the raw data. This folder is divided to two subfolders, one for each detector (H1/ and L1/), and within each, to additional subfolders:

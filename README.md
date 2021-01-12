@@ -226,6 +226,9 @@ The path to the data folder is: `/arch/tommaria/data/`, the data folder's subfol
     - `pois/` - files containing spectrograms that were flagged as outliers by the different methods.
     - `tomove/` - generated spectrograms that were not processed in this project (they were generated after the spectrograms in `moved/` were processed, with the purpose of processing them as well, but I never got to it).
   - `injected/` - a folder containing the spectrograms of the injected waveforms, generated during the evaluation phase of the project.
+- `gravityspy/` - a folder containing the labeled spectrograms used for training the network.
 - `multi_scale/conditioned_data/16KHZ` - a folder containing multi-scale spectrograms, generated during a small followup of this project, a multi-scale version of the pipeline.
 
 The `/arch/` drive is a slower, archive drive. It is used to store the bulk/generated data because of it's large volume, but when I ran the project, the files were saved to the faster `/storage/fast/` drive, in the path `/storage/fast/users/tommaria/data/` (which contains a subfolder tree very similar to the one in `/arch/tommaria/data/`).
+
+## On power

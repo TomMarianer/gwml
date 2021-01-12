@@ -232,3 +232,6 @@ The path to the data folder is: `/arch/tommaria/data/`, the data folder's subfol
 The `/arch/` drive is a slower, archive drive. It is used to store the bulk/generated data because of it's large volume, but when I ran the project, the files were saved to the faster `/storage/fast/` drive, in the path `/storage/fast/users/tommaria/data/` (which contains a subfolder tree very similar to the one in `/arch/tommaria/data/`).
 
 ## On power
+The data on the power cluster is stored in the `/dovilabfs/` drive - Dovi's storage drive on the cluster that we purchased from the university for this project.
+The path to the data relevant to this project is `/dovilabfs/work/tommaria/gw/`. The files in this directory are somewhat disorganized, and when I wrote this readme I tried to make the directories as clean as possible, but I didn't want to move around too many things because the code in the scripts described above use some of these paths. Therefore, I kept the files used by the project in the same place but tried to delete most of the files that aren't related (mostly files created during the different things I tried during the research). Some files I didn't want to delete 'just in case', so I moved them to folders named `unsorted/`. The folder's subfolder tree:
+- data

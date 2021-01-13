@@ -10,7 +10,7 @@ The three machines, and motivation for using each, are:
 
 Both astrophys and power are high performance clusters, running PBS servers. Therefore, the code run on these clusters was written as `.py` scripts. Each script (or group of scripts performing similar tasks) has a corresponding `.pbs` file, containing pbs commands to submit the script to the cluster. The submission itself is then done using the following command:
 ```
-qsub -q QUEUE_NAME PBS_FILE.pbs
+qsub -q QUEUE_NAME PBS_FILE
 ```
 
 # Project pipeline

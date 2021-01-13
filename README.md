@@ -30,9 +30,8 @@ qsub -q QUEUE_NAME PBS_FILE
     - [local 2](#on-local-3)
     - [astrophys 2](#on-astrophys-4)
   --->
-<details>
-  <summary>Table of Contents</summary>
 
+## Table of Contents
 - [General](#general)
 - [Pipeline](#project-pipeline)
   - [Training](#training)
@@ -46,8 +45,6 @@ qsub -q QUEUE_NAME PBS_FILE
 - [Data](#data)
   - [astrophys](#on-astrophys-5)
   - [power](#on-power-3)
-</details>
-
 
 # Project pipeline
 Description of the project pipeline, including downloading raw GW strain files, conditioning and creating spectrograms, training a CNN, processing spectrograms through the trained network, detecting outliers and evaluating the search by injecting simulated signals.
@@ -56,7 +53,7 @@ Description of the project pipeline, including downloading raw GW strain files, 
 ### On astrophys:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
-| Download files from GWOSC | download GW strain files containing glithces labeled by Gravity Spy | `download_gs.py` | `pbs_download.pbs` | in the PBS file uncomment/comment out the relevant lines. |
+| Download files from GWOSC | download GW strain files containing glithces labeled by Gravity Spy | `download_gs.py` | `pbs_download.pbs` | in the PBS file uncomment/comment out the relevant lines (so the relevant script is submitted). |
 | Generate training set | generate spectrograms of the time-stamps in Gravity Spy and label them accordingly | `create_gs_fromraw.py` | `pbs_create_fromraw.pbs` | in order to avoid issues on the cluster, the script conditions only 1000 time-stamps at a time, so the script should be run several times, with a different value for the  `idx_start` variable, starting from 0 and changing in steps of 1000 (the number of time-stamps conditioned each time can be increased somewhat, to around 2500 but not much more as the script is written currently). |
 | Combine training set | combine the files generated in the previous step to a single `.hdf5` containing the entire training set | `combine_fromraw.py` | `pbs_combine_fromraw.pbs` | |
 | Transfer to power | transfer the `.hdf5` file containing the training set to power cluster | | | can be done using the `scp` command:<br>`scp FILE PATH_ON_POWER` |
@@ -69,7 +66,7 @@ Description of the project pipeline, including downloading raw GW strain files, 
 | Split and augment | split the data set into training, test and validation sets, and augment the training set | `split_augment.py` | `pbs_split_augment.pbs` | |
 | Train model | train a deep CNN using the generated spectrograms | `train_network.py` | `pbs_train_network.pbs` | several training hyper-parameters can be chosen in the parameters file `gsparams.py` such as the pre-trained model to use (`extract_model` variabel), the input size, the optimization method and the name given to thel model. |
 | Evaluate model | evaluate the trained model and print the loss and classification accuracy for the training, test and validation sets | `model_evaluation.py` | `pbs_model_eval.pbs` | prints the results to `stdout`. |
-| Extract labeled set features | feed the labeled data set through the network and extract feature space representations, softmax predictions and values relevant to the Gram matrix method | `extract_gram.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. |
+| Extract labeled set features | feed the labeled data set through the network and extract feature space representations, softmax predictions and values relevant to the Gram matrix method | `extract_gram.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines (so the relevant script is submitted). |
 
 [↥ back to top](#general)
 
@@ -77,7 +74,7 @@ Description of the project pipeline, including downloading raw GW strain files, 
 ### On astrophys:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
-| Download files from GWOSC | download bulk GW strain files | `download_16.py` | `pbs_download.pbs` | in the PBS file uncomment/comment out the relevant lines. in the script choose the desired detector (currently either 'H1' or 'L1') and the desired file indices. |
+| Download files from GWOSC | download bulk GW strain files | `download_16.py` | `pbs_download.pbs` | in the PBS file uncomment/comment out the relevant lines (so the relevant script is submitted). in the script choose the desired detector (currently either 'H1' or 'L1') and the desired file indices. |
 | Condition data | condition the raw strain data and generate spectrograms. | `condition_raw_par.py` | `pbs_condition.pbs` | in the script, choose the detector to be conditioned (either 'H' or 'L') and the segment numbers to be conditioned (when I ran this script I ran it on groups of 50 segments at a time). This script generates a folder for each segment, and within it a seperate `.hdf5` file for each chunk conditioned. |
 | Combine spectrograms | combine the spectrograms generated in each segment to a single `.hdf5` file | `combine_segment.py` | `pbs_combine.pbs` | as in the previous step, choose the desired detector and segments to be combined. |
 | Transfer to power | transfer the `.hdf5` files containing the spectrograms to be processed with the network to power cluster | | | can be done using the `scp` command:<br>`scp FILE PATH_ON_POWER`. Since there might be many large spectrogram files, I did this in groups, and used the public storage folders on power, /scratch100/, /scratch200/ or /scratch300/ to temporarily store these files only when processing them through the network. |
@@ -87,7 +84,7 @@ Description of the project pipeline, including downloading raw GW strain files, 
 ### On power:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
-| Extract features | process the unlabeled spectrograms through the network and extract the feature space representations, softmax predictions and Gram method deviations. | `extract_gram_unlabeled.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. In the script choose the desired detector. |
+| Extract features | process the unlabeled spectrograms through the network and extract the feature space representations, softmax predictions and Gram method deviations. | `extract_gram_unlabeled.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines (so the relevant script is submitted). In the script choose the desired detector. |
 | Transfer to local | transfer the `.hdf5` files containing the extracted features for both training set as well as the unlabeled spectrograms to be searched to the machine that will run the jupyter notebooks in the 'local' subfolder. | | | can be done the `scp` command |
 
 [↥ back to top](#general)
@@ -132,8 +129,8 @@ Description of the project pipeline, including downloading raw GW strain files, 
 ### On astrophys:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
-| Inject ad-hoc waveforms | inject ad-hoc waveforms, to a small number of time-stamps with the no glitch constraint. | `inject_times.py` | `pbs_inject.pbs` | in the PBS file uncomment/comment out the relevant lines. This script should be run once for each detector and for each waveform type (chosen by the `detector` and `inj_type` variables). The script is not written very well, so in addition to the variables, the loop related to the desired injection type should be uncommented, and the rest commented out. |
-| Inject CCSNe waveforms | inject CCSNe waveforms, to a small number of time-stamps with the no glitch constraint. | `inject_ccsn.py` | `pbs_inject.pbs` | in the PBS file uncomment/comment out the relevant lines. This script should be run once for each detector and for each CCSNe paper (chosen by the `detector` and `ccsn_paper` variables). |
+| Inject ad-hoc waveforms | inject ad-hoc waveforms, to a small number of time-stamps with the no glitch constraint. | `inject_times.py` | `pbs_inject.pbs` | in the PBS file uncomment/comment out the relevant lines (so the relevant script is submitted). This script should be run once for each detector and for each waveform type (chosen by the `detector` and `inj_type` variables). The script is not written very well, so in addition to the variables, the loop related to the desired injection type should be uncommented, and the rest commented out. |
+| Inject CCSNe waveforms | inject CCSNe waveforms, to a small number of time-stamps with the no glitch constraint. | `inject_ccsn.py` | `pbs_inject.pbs` | in the PBS file uncomment/comment out the relevant lines (so the relevant script is submitted). This script should be run once for each detector and for each CCSNe paper (chosen by the `detector` and `ccsn_paper` variables). |
 | Transfer to power | transfer the `.hdf5` files containing the injected spectrograms to be processed with the network to power cluster | | | can be done using the `scp` command:<br>`scp FILE PATH_ON_POWER`. |
 
 [↥ back to top](#general)
@@ -141,7 +138,7 @@ Description of the project pipeline, including downloading raw GW strain files, 
 ### On power:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
-| Extract features | process the injected spectrograms through the network and extract the feature space representations, softmax predictions and Gram method deviations. | `extract_gram_unlabeled.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. In the script choose the desired detector. |
+| Extract features | process the injected spectrograms through the network and extract the feature space representations, softmax predictions and Gram method deviations. | `extract_gram_unlabeled.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines (so the relevant script is submitted). In the script choose the desired detector. |
 | Transfer to local | transfer the `.hdf5` files containing the extracted features machine that runs the jupyter notebooks in the 'local' subfolder. | | | can be done the `scp` command |
 
 [↥ back to top](#general)
@@ -304,7 +301,7 @@ The `/arch/` drive is a slower, archive drive. It is used to store the bulk/gene
 
 ## On power
 The data on the power cluster is stored in the `/dovilabfs/` drive - Dovi's storage drive on the cluster that we purchased from the university for this project.
-The path to the data relevant to this project is `/dovilabfs/work/tommaria/gw/`. The files in this directory are somewhat disorganized, and when I wrote this readme I tried to make the directories as clean as possible, but I didn't want to move around too many things because the code in the scripts described above use some of these paths. Therefore, I kept the files used by the project in the same place but tried to delete most of the files that aren't related (mostly files created during the different things I tried during the research). Some files I didn't want to delete 'just in case', so I moved them to folders named `unsorted/`. The folder's subfolder tree:
+The path to the data relevant to this project is `/dovilabfs/work/tommaria/gw/`. The files in this directory are somewhat disorganized, and when I wrote this readme I tried to make the directories as clean as possible, but I didn't want to move around too many things because the code in the scripts described above uses some of these paths. Therefore, I kept the files used by the project in the same place but tried to delete most of the files that aren't related (mostly files created during the different things I tried during the research). Some files I didn't want to delete 'just in case', so I moved them to folders named `unsorted/`. The folder's subfolder tree:
 - `data/` - folder containing data used/created on power. This folder contains the following subfolders:
   - `gravityspy/` - folder containing data relevant to this project, contains the following subfolders:
     - `fromraw/` - spectrograms used for training the network. This folder contains three files, one with the full original data set generated on astrophys (ends with `gs.hdf5`), one with the augmentation spectrograms (has the suffix `augmentation3`) and one with the original data set split into training, test and validation set (has the suffix `split`).

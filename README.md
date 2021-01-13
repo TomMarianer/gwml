@@ -13,6 +13,35 @@ Both astrophys and power are high performance clusters, running PBS servers. The
 qsub -q QUEUE_NAME PBS_FILE
 ```
 
+##### Table of Contents
+- [General](#general)
+- [Pipeline](#project-pipeline)
+  - [Training](#training)
+    - [astrophys](#on-astrophys)
+    - [power](#on-power)
+  - [Search](#search)
+    - [astrophys](#on-astrophys-1)
+    - [power](#on-power-1)
+    - [local](#on-local)
+    - [astrophys 2](#on-astrophys-2)
+    - [local 2](#on-local-1)
+  - [Evaluation](#evaluation)
+    - [local](#on-local-2)
+    - [astrophys](#on-astrophys-3)
+    - [power](#on-power-2)
+    - [local 2](#on-local-3)
+    - [astrophys 2](#on-astrophys-4)
+- [Subfolder tree](#project-subfolder-tree)
+  - [Astrophys](#astrophys)
+  - [Local](#local)
+  - [Power](#power)
+  - [Shared](#shared)
+- [Data](#data)
+  - [astrophys](#on-astrophys-5)
+  - [power](#on-power-3)
+    
+
+
 # Project pipeline
 ## Training
 ### On astrophys:

@@ -51,7 +51,7 @@ qsub -q QUEUE_NAME PBS_FILE
 
 # Project pipeline
 Description of the project pipeline, including downloading raw GW strain files, conditioning and creating spectrograms, training a CNN, processing spectrograms through the trained network, detecting outliers and evaluating the search by injecting simulated signals.
-<br>[↥ back to top](#general)
+
 ## Training
 ### On astrophys:
 | Action | Description | Script to submit | PBS file | Notes |

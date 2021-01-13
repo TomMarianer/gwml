@@ -50,6 +50,7 @@ qsub -q QUEUE_NAME PBS_FILE
 
 
 # Project pipeline
+Description of the project pipeline, including downloading raw GW strain files, conditioning and creating spectrograms, training a CNN, processing spectrograms through the trained network, detecting outliers and evaluating the search by injecting simulated signals.
 ## Training
 ### On astrophys:
 | Action | Description | Script to submit | PBS file | Notes |
@@ -251,7 +252,7 @@ The `shared/` subfolder tree:
 - `tois.hdf5` - file containing the 'times of interest' - the outlier time-stamps for each method.
 
 # Data
-A description of the data generated/used in this project, and their whereabouts.
+A description of the data generated/used in this project, and their paths.
 ## On astrophys
 The data on the astrophys cluster is stored on the `/arch/` drive - a large (175TB) storage drive.
 The path to the data folder is: `/arch/tommaria/data/`, the data folder's subfolder tree:

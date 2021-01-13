@@ -51,6 +51,7 @@ qsub -q QUEUE_NAME PBS_FILE
 
 # Project pipeline
 Description of the project pipeline, including downloading raw GW strain files, conditioning and creating spectrograms, training a CNN, processing spectrograms through the trained network, detecting outliers and evaluating the search by injecting simulated signals.
+<br>[↥ back to top](#general)
 ## Training
 ### On astrophys:
 | Action | Description | Script to submit | PBS file | Notes |
@@ -60,6 +61,8 @@ Description of the project pipeline, including downloading raw GW strain files, 
 | Combine training set | combine the files generated in the previous step to a single `.hdf5` containing the entire training set | `combine_fromraw.py` | `pbs_combine_fromraw.pbs` | |
 | Transfer to power | transfer the `.hdf5` file containing the training set to power cluster | | | can be done using the `scp` command:<br>`scp FILE PATH_ON_POWER` |
 
+[↥ back to top](#general)
+
 ### On power:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
@@ -67,6 +70,8 @@ Description of the project pipeline, including downloading raw GW strain files, 
 | Train model | train a deep CNN using the generated spectrograms | `train_network.py` | `pbs_train_network.pbs` | several training hyper-parameters can be chosen in the parameters file `gsparams.py` such as the pre-trained model to use (`extract_model` variabel), the input size, the optimization method and the name given to thel model. |
 | Evaluate model | evaluate the trained model and print the loss and classification accuracy for the training, test and validation sets | `model_evaluation.py` | `pbs_model_eval.pbs` | prints the results to `stdout`. |
 | Extract labeled set features | feed the labeled data set through the network and extract feature space representations, softmax predictions and values relevant to the Gram matrix method | `extract_gram.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. |
+
+[↥ back to top](#general)
 
 ## Search
 ### On astrophys:
@@ -77,11 +82,15 @@ Description of the project pipeline, including downloading raw GW strain files, 
 | Combine spectrograms | combine the spectrograms generated in each segment to a single `.hdf5` file | `combine_segment.py` | `pbs_combine.pbs` | as in the previous step, choose the desired detector and segments to be combined. |
 | Transfer to power | transfer the `.hdf5` files containing the spectrograms to be processed with the network to power cluster | | | can be done using the `scp` command:<br>`scp FILE PATH_ON_POWER`. Since there might be many large spectrogram files, I did this in groups, and used the public storage folders on power, /scratch100/, /scratch200/ or /scratch300/ to temporarily store these files only when processing them through the network. |
 
+[↥ back to top](#general)
+
 ### On power:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
 | Extract features | process the unlabeled spectrograms through the network and extract the feature space representations, softmax predictions and Gram method deviations. | `extract_gram_unlabeled.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. In the script choose the desired detector. |
 | Transfer to local | transfer the `.hdf5` files containing the extracted features for both training set as well as the unlabeled spectrograms to be searched to the machine that will run the jupyter notebooks in the 'local' subfolder. | | | can be done the `scp` command |
+
+[↥ back to top](#general)
 
 ### On local:
 | Action | Description | Notebook to run | Notes |
@@ -93,16 +102,22 @@ Description of the project pipeline, including downloading raw GW strain files, 
 | Flag outliers | flag time-stamps containing outliers according to the different methods, and save them to `tois.hdf5`. | `flag_outliers.ipynb` | this notebook can be used to determine the thresholds of the density, and Gram, methods - the thresholds are chosen to achieve a desired number of identified outliers. |
 | Plot map space | generate a plot of the map space using matplotlib | `plot_map_space.ipynb` | optional, this notebook was used to generate the plot in the paper. | Transfer `tois.hdf5` to astrophys | transfer the outlier time-stamps file to astrophys. | | the file is saved to the github folder (to the 'shared' subfolder), so this can be done simply by using the `git pull` command on astrophys. |
 
+[↥ back to top](#general)
+
 ### On astrophys:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
 | Get flagged | generate a file containing the spectrograms of the outlier time-stamps for each outlier detection method. | `get_pois_script.py` | `pbs_pois.pbs` | the script should be run several times, once for each outlier detection method, and for each detector (chosen by the `method` and `detector` variables in the script). |
 | Transfer to local | transfer the files containing the outlier spectrograms to the machine running the jupyter notebooks. | | | |
 
+[↥ back to top](#general)
+
 ### On local:
 | Action | Description | Notebook to run | Notes |
 | ------ | ----------- | --------------- | ----- |
 | Visualize outliers | generate plots of the outlier spectrograms, in order to identify the types of outliers. | `plot_flagged.ipynb` | this notebook is not organized and documented well, it probably should be written from scratch. |
+
+[↥ back to top](#general)
 
 ## Evaluation
 ### On local:
@@ -112,6 +127,8 @@ Description of the project pipeline, including downloading raw GW strain files, 
 | Generate white noise waveform | generate the random white noise waveform to be injected. | `gen_wn.ipynb` |  |
 | Transfer to astrophys | transfer the `.csv` files containing injection times and sky locations to astrophys. | | the files are saved to the github folder (to the 'shared' subfolder), so this can be done simply by using the `git pull` command on astrophys. |
 
+[↥ back to top](#general)
+
 ### On astrophys:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
@@ -119,11 +136,15 @@ Description of the project pipeline, including downloading raw GW strain files, 
 | Inject CCSNe waveforms | inject CCSNe waveforms, to a small number of time-stamps with the no glitch constraint. | `inject_ccsn.py` | `pbs_inject.pbs` | in the PBS file uncomment/comment out the relevant lines. This script should be run once for each detector and for each CCSNe paper (chosen by the `detector` and `ccsn_paper` variables). |
 | Transfer to power | transfer the `.hdf5` files containing the injected spectrograms to be processed with the network to power cluster | | | can be done using the `scp` command:<br>`scp FILE PATH_ON_POWER`. |
 
+[↥ back to top](#general)
+
 ### On power:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
 | Extract features | process the injected spectrograms through the network and extract the feature space representations, softmax predictions and Gram method deviations. | `extract_gram_unlabeled.py` | `pbs_extract.pbs` | in the PBS file uncomment/comment out the relevant lines. In the script choose the desired detector. |
 | Transfer to local | transfer the `.hdf5` files containing the extracted features machine that runs the jupyter notebooks in the 'local' subfolder. | | | can be done the `scp` command |
+
+[↥ back to top](#general)
 
 ### On local:
 | Action | Description | Notebook to run | Notes |
@@ -131,11 +152,15 @@ Description of the project pipeline, including downloading raw GW strain files, 
 | Map spectrograms | map injected spectrograms to the map space, and append them to the features files. | `create_maps.ipynb` | choose the path to the folder containing the desired features files. |
 | Process injected | post-process the injected spectrograms (both the ad-hoc and CCSNe waveforms), and get detection statistics using the different outlier detection methods. | `process_injected.ipynb` and `process_injected_ccsn.ipynb` | these notebook is not organized and documented well, theyt probably should be written from scratch. |
 
+[↥ back to top](#general)
+
 ### On astrophys:
 | Action | Description | Script to submit | PBS file | Notes |
 | ------ | ----------- | ---------------- | -------- | ----- |
 | Gather statistics | for the chosen waveforms, inject into additional time-stamps (without the no glitch constraint) for additional detection statistics. The waveforms chosen are the waveforms for which at least half of the injections were detected in both detectors by at least one method. | `inject_stats.py` and `inject_ccsn_stats.py` | `pbs_inject.pbs` | the same notes as for the previous injection scripts apply. In addition, since these scripts generate 1000 injections, they are divided into groups of 100 injections (which generate separate files for each group). |
 | Combine injections | combine the injections generated by the previous scripts into a single file for each injection waveform. | `combine_injected.py` | `pbs_combine_injected.pbs` | should be performed for each injected waveform separately. |
+
+[↥ back to top](#general)
 
 The final steps as for the previous injections should be repeated for the new injections (extract features using the network on power, map the features to the map space and post-process the injections using the relevant notebooks on local).
 
@@ -189,6 +214,8 @@ The `astrophys/` subfolder tree:
   - `tools_gs.py` - tools used to condition the strain data and generate the spectrograms, non-parallel version - obsolete.
   - `tools_gs_par.py` - tools used to condition the strain data and generate the spectrograms, parallel version (this one should be used).
 
+[↥ back to top](#general)
+
 ## Local
 The `local/` subfolder tree:
 - `notebooks/` - jupyter notebooks used for small processing tasks and for creating visualizations. This folder contains the following files:
@@ -215,6 +242,8 @@ The `local/` subfolder tree:
   - `plot_tools.py` - tools used to generate the interactive plots of the map space together with spectrograms of the chosen points. These plots are generated using holoviews with a bokeh backend.
   - `plot_tools_mpl.py` - tools used to generate plots that were used in the paper. These plots were generated using matplotlib (mpl allows for better/easier customization required for the paper plots).
 
+[↥ back to top](#general)
+
 ## Power
 Power was used to train the deep CNN used in the project, and to process the unlabeled spectrograms through it once it was trained. The reason is the high performance GPU installed on it reduced the training and processing time significantly.
 The `power/` subfolder tree:
@@ -235,6 +264,8 @@ The `power/` subfolder tree:
   - `gsparams.py` - parameters file, containing parameters relating to the CNN.
   - `gstools.py` - tools relating to training the CNN and to extracting the relevant features from it.
 
+[↥ back to top](#general)
+
 ## Shared
 The `shared/` folder contains files used in multiple locations. In practice, they are used only in astrophys and locally.
 The `shared/` subfolder tree:
@@ -250,6 +281,8 @@ The `shared/` subfolder tree:
 - `inject_tools.py` - tools used for injecting the simulated waveforms.
 - `inject_tools_backup.py` - backup of the previous file - obsolete version.
 - `tois.hdf5` - file containing the 'times of interest' - the outlier time-stamps for each method.
+
+[↥ back to top](#general)
 
 # Data
 A description of the data generated/used in this project, and their paths.
@@ -267,6 +300,7 @@ The path to the data folder is: `/arch/tommaria/data/`, the data folder's subfol
 - `multi_scale/conditioned_data/16KHZ` - a folder containing multi-scale spectrograms, generated during a small followup of this project, a multi-scale version of the pipeline (not relevant to this project).
 
 The `/arch/` drive is a slower, archive drive. It is used to store the bulk/generated data because of it's large volume, but when I ran the project, the files were saved to the faster `/storage/fast/` drive, in the path `/storage/fast/users/tommaria/data/` (which contains a subfolder tree very similar to the one in `/arch/tommaria/data/`).
+<br>[↥ back to top](#general)
 
 ## On power
 The data on the power cluster is stored in the `/dovilabfs/` drive - Dovi's storage drive on the cluster that we purchased from the university for this project.
@@ -278,3 +312,5 @@ The path to the data relevant to this project is `/dovilabfs/work/tommaria/gw/`.
   - `multi_scale/` - files relevant the 'multi-scale' followup, not relevant to this project.
 - `github/` - folder containing cloned git repositories, not relevant.
 - `gravityspy/gpu/` - folder containing outputs of the training and evaluation processes, as well as the `fromraw_gs_wrap_no_ty/new/resnet152v2/adadelta/gpu_test_15/` subpath, containing the trained model (`gpu_test_15.h5`) and the best weights of the model (the weights corresponding to the epoch with the highest validation accuracy during the training process, `gpu_test_15.weights.best.hdf5`).
+
+[↥ back to top](#general)

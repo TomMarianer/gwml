@@ -327,7 +327,21 @@ Other than this, there are possible improvements to be made to different aspects
   - Current state - supervised - using the labeled Gravity Spy glitch data set from O1 and O2.
   - Possible improvements - utilize unlabeled spectrograms to train a network (most likely an autoencoder) in an unsupervised/semisupervised manner. This can be incorporated into the pipeline in several ways:
     - Combined model - similar to what is proposed by [Noroozi et al.](https://arxiv.org/abs/1706.03692), a model constructed from both unsupervised and supervised sub-networks, where the unsupervised sub-network is trained on both labeled and unlabeled spectrograms, and the supervised sub-network is trained only on the labeled spectrograms.
-    - 
+    - Two models (X's first suggestion) - an unsupervised model to detect outliers in the full distribution (they should be glitches + spectrograms of interest), followed by a supervised model to classify the outliers (this could be a similar model to the one used in the original pipeline, perhaps even the same one).
+    - Two models (X's second, preferred suggestion) - an unsupervised model to detect outliers in the full distribution (they should be glitches + spectrograms of interest, same as the previous bullet), followed by a second unsupervised model trained on the glitch data set to distinguish glitches from spectrograms of interest.
+- Outlier detection:
+  - Current state - two outlier detection methods:
+    - CNN for feature extraction, UMAP for dimensionality reduction and KDE for density estimation in map space.
+    - Gram matrix out-of-distribution detection.
+  - Possible improvements:
+    - Gram matrix OOD adjustments - the authors of the original Gram matrix OOD paper suggested a couple of potential improvemetns to our implementation of their method in a short email exchange following our publication. First, they suggested to use higher order Gram matrices, as described in their [original paper](https://arxiv.org/abs/1912.12510) (which we didn't use mainly because of performane issues, but they suggested to maybe use some subset that still includes some higher orders). Second, they suggested to examine a normalization process they proposed in a [followup work](https://github.com/paaatcha/gram-ood) they perfromed.
+    - Other OOD methods - the first one I would try is the Mahalanobis distance method, described by [Lee et al.](https://papers.nips.cc/paper/2018/file/abdeb6f575ac5c6676b747bca8d09cc2-Paper.pdf).
+    - Normalized flows (X's suggestion) - I'm not entirely sure, but I think they are a way to estimate the distribution, which can be used for outlier detection. X suggested incorporating them together with an autoencoder.
+- Conditioning:
+  - Current state - 2 second spectrograms, generated with multi-Q transform with a Q range of 4-64.
+  - Possible improvements:
+    - Different duration spectrograms - shorter spectrograms for shorter signals, longer spectrograms for longer signals.
+    - Q range - limit the Q range to only higher values (close to ~100), this might be useful for longer signals. The motivation for this is the >30s signal GW170817. This signal is easily detected (visually) with a Q~100, but with a Q range of 4-100 the lower values are chosen and in the resulting spectrogram the signal isn't visible, so limiting the Q range to values close to 100 should be better for detecting long signals (I haven't tested this, but my intuition is that with the exact same pipeline as the original, except for limiting the Q value to ~100, GW170817 should be detected).
 
 [↥ back to top](#general)
 
